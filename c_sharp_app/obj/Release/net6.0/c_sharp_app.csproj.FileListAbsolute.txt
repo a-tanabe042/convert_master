@@ -1,0 +1,15 @@
+/Users/akifumitanabe/Desktop/convert_master/c_sharp_app/bin/Release/net6.0/c_sharp_app
+/Users/akifumitanabe/Desktop/convert_master/c_sharp_app/bin/Release/net6.0/c_sharp_app.deps.json
+/Users/akifumitanabe/Desktop/convert_master/c_sharp_app/bin/Release/net6.0/c_sharp_app.runtimeconfig.json
+/Users/akifumitanabe/Desktop/convert_master/c_sharp_app/bin/Release/net6.0/c_sharp_app.dll
+/Users/akifumitanabe/Desktop/convert_master/c_sharp_app/bin/Release/net6.0/c_sharp_app.pdb
+/Users/akifumitanabe/Desktop/convert_master/c_sharp_app/obj/Release/net6.0/c_sharp_app.csproj.AssemblyReference.cache
+/Users/akifumitanabe/Desktop/convert_master/c_sharp_app/obj/Release/net6.0/c_sharp_app.GeneratedMSBuildEditorConfig.editorconfig
+/Users/akifumitanabe/Desktop/convert_master/c_sharp_app/obj/Release/net6.0/c_sharp_app.AssemblyInfoInputs.cache
+/Users/akifumitanabe/Desktop/convert_master/c_sharp_app/obj/Release/net6.0/c_sharp_app.AssemblyInfo.cs
+/Users/akifumitanabe/Desktop/convert_master/c_sharp_app/obj/Release/net6.0/c_sharp_app.csproj.CoreCompileInputs.cache
+/Users/akifumitanabe/Desktop/convert_master/c_sharp_app/obj/Release/net6.0/c_sharp_app.dll
+/Users/akifumitanabe/Desktop/convert_master/c_sharp_app/obj/Release/net6.0/refint/c_sharp_app.dll
+/Users/akifumitanabe/Desktop/convert_master/c_sharp_app/obj/Release/net6.0/c_sharp_app.pdb
+/Users/akifumitanabe/Desktop/convert_master/c_sharp_app/obj/Release/net6.0/c_sharp_app.genruntimeconfig.cache
+/Users/akifumitanabe/Desktop/convert_master/c_sharp_app/obj/Release/net6.0/ref/c_sharp_app.dll
