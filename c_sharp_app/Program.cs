@@ -31,10 +31,7 @@ class Program
                 string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(csvFilePath);
                 string outputJsonPath = Path.Combine(outputDir, fileNameWithoutExtension + ".json");
 
-                // CSVファイルの読み込み
-                Console.WriteLine($"CSVファイルを読み込みます: {csvFilePath}");
                 string csvData = File.ReadAllText(csvFilePath);
-                Console.WriteLine($"読み込んだCSVデータ:\n{csvData}");
 
                 // CSV → JSON 変換（Rustの関数を呼び出し）
                 Console.WriteLine("CSV → JSON 変換を実行します...");
@@ -42,12 +39,10 @@ class Program
 
                 if (jsonPointer == IntPtr.Zero)
                 {
-                    Console.WriteLine($"エラー: Rust関数からのJSONデータ取得に失敗しました: {csvFilePath}");
                     continue;
                 }
 
                 string jsonData = RustInterop.ConvertPointerToString(jsonPointer);
-                Console.WriteLine($"生成されたJSONデータ:\n{jsonData}");
 
                 // JSONデータをファイルに保存
                 File.WriteAllText(outputJsonPath, jsonData);
