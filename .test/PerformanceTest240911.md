@@ -8,6 +8,10 @@ test data: 1,000,000人
 mac os: M1
 memory: 16GB
 
+[file]
+large_data.csv
+size: 2.0M
+
 [結果]
 10万人のユーザーデータCSV → JSON 変換にかかった時間:
 全体の処理時間: 0.1292秒 (C#とRust)
