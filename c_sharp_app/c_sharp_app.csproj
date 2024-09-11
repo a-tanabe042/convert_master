@@ -5,4 +5,11 @@
     <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
 
+ <ItemGroup>
+    <!-- assets/csvフォルダ内のすべてのCSVファイルをコピー -->
+    <None Update="assets/csv/*.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

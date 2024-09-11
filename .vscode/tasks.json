@@ -1,0 +1,70 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Build Rust",
+        "type": "shell",
+        "command": "cargo",
+        "args": [
+          "build",
+          "--release"
+        ],
+        "options": {
+          "cwd": "${workspaceFolder}/rust_app"  // rust_app ディレクトリに移動してビルドする
+        },
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "Copy Rust DLL",
+        "type": "shell",
+        "dependsOn": "Build Rust",
+        "command": "cp",
+        "args": [
+          "${workspaceFolder}/rust_app/target/release/librust_app.dylib",  
+          "${workspaceFolder}/c_sharp_app/bin/Debug/net6.0/" 
+        ],
+        "problemMatcher": []
+      },
+      {
+        "label": "Clean C#",
+        "type": "shell",
+        "dependsOn": "Copy Rust DLL",
+        "command": "dotnet",
+        "args": [
+          "clean",
+          "${workspaceFolder}/c_sharp_app/c_sharp_app.csproj"
+        ],
+        "problemMatcher": []
+      },
+      {
+        "label": "Build C#",
+        "type": "shell",
+        "dependsOn": "Clean C#",
+        "command": "dotnet",
+        "args": [
+          "build",
+          "${workspaceFolder}/c_sharp_app/c_sharp_app.csproj"
+        ],
+        "group": "build",
+        "problemMatcher": ["$msCompile"]
+      },
+      {
+        "label": "Run C#",
+        "type": "shell",
+        "dependsOn": "Build C#",
+        "command": "dotnet",
+        "args": [
+          "run",
+          "--project",
+          "${workspaceFolder}/c_sharp_app/c_sharp_app.csproj"
+        ],
+        "group": "build",
+        "problemMatcher": []
+      }
+    ]
+  }
+  

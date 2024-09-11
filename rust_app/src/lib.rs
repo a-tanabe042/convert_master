@@ -1,4 +1,1 @@
-#[no_mangle]
-pub extern "C" fn hello_from_rust() {
-    println!("Hello, Rust!");
-}
+mod csv_to_json;

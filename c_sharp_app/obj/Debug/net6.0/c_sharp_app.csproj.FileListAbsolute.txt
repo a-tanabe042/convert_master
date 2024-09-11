@@ -1,3 +1,5 @@
+/Users/akifumitanabe/Desktop/convert_master/c_sharp_app/bin/Debug/net6.0/assets/csv/data1.csv
+/Users/akifumitanabe/Desktop/convert_master/c_sharp_app/bin/Debug/net6.0/assets/csv/data2.csv
 /Users/akifumitanabe/Desktop/convert_master/c_sharp_app/bin/Debug/net6.0/c_sharp_app
 /Users/akifumitanabe/Desktop/convert_master/c_sharp_app/bin/Debug/net6.0/c_sharp_app.deps.json
 /Users/akifumitanabe/Desktop/convert_master/c_sharp_app/bin/Debug/net6.0/c_sharp_app.runtimeconfig.json
