@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 
@@ -6,6 +7,10 @@ class Program
 {
     static void Main()
     {
+        // Stopwatchを使って実行時間を計測
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.Start();
+
         try
         {
             // 実行ファイルがあるディレクトリを基準にする
@@ -58,6 +63,12 @@ class Program
         catch (Exception ex)
         {
             Console.WriteLine($"予期しないエラーが発生しました: {ex.Message}");
+        }
+        finally
+        {
+            // Stopwatchを停止して、経過時間を表示
+            stopwatch.Stop();
+            Console.WriteLine($"処理時間: {stopwatch.Elapsed.TotalSeconds} 秒");
         }
     }
 }
