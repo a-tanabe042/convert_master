@@ -1,15 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
+    <OutputType>Exe</OutputType> <!-- ここで実行可能なアプリケーションとして設定します -->
   </PropertyGroup>
 
- <ItemGroup>
+  <ItemGroup>
     <!-- assets/csvフォルダ内のすべてのCSVファイルをコピー -->
     <None Update="assets/csv/*.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-
 </Project>

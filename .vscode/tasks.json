@@ -25,7 +25,7 @@
         "command": "cp",
         "args": [
           "${workspaceFolder}/rust_app/target/release/librust_app.dylib",  
-          "${workspaceFolder}/c_sharp_app/bin/Debug/net6.0/" 
+          "${workspaceFolder}/c_sharp_app/bin/Debug/net8.0/" 
         ],
         "problemMatcher": []
       },
