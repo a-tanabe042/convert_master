@@ -73,7 +73,6 @@ class Program
     }
 }
 
-// Rustの関数を呼び出すためのインターフェース
 public static class RustInterop
 {
     // Rustで実装した CSV → JSON 変換関数をインポート
