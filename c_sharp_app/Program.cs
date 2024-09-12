@@ -35,7 +35,7 @@ class Program
                 // ファイル名を取得し、拡張子を .json に変更
                 string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(csvFilePath);
                 string outputJsonPath = Path.Combine(outputDir, fileNameWithoutExtension + ".json");
-
+                // CSVファイルを読み込む
                 string csvData = File.ReadAllText(csvFilePath);
 
                 // CSV → JSON 変換（Rustの関数を呼び出し）
@@ -46,7 +46,7 @@ class Program
                 {
                     continue;
                 }
-
+                // JSONデータをC#の文字列に変換
                 string jsonData = RustInterop.ConvertPointerToString(jsonPointer);
 
                 // JSONデータをファイルに保存
@@ -73,10 +73,12 @@ class Program
     }
 }
 
+// Rustの関数を呼び出すためのインターフェース
 public static class RustInterop
 {
     // Rustで実装した CSV → JSON 変換関数をインポート
     [DllImport("librust_app.dylib", CallingConvention = CallingConvention.Cdecl, EntryPoint = "csv_to_json")]
+    // これは、Rustの関数のシグネチャに合わせています
     public static extern IntPtr ConvertCsvToJson(string csvData);
 
     // 文字列ポインタをC#の文字列に変換するためのユーティリティ関数
@@ -86,6 +88,7 @@ public static class RustInterop
         {
             return null;
         }
+        // ポインタから文字列に変換
         return Marshal.PtrToStringAnsi(pointer);
     }
 }

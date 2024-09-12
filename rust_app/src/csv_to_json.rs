@@ -1,8 +1,9 @@
 extern crate csv;
-extern crate serde_json;
+extern crate json;
 use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
 use std::time::Instant;
+use json::JsonValue;
 
 #[no_mangle]
 pub extern "C" fn csv_to_json(csv_input: *const c_char) -> *mut c_char {
@@ -16,30 +17,29 @@ pub extern "C" fn csv_to_json(csv_input: *const c_char) -> *mut c_char {
     let mut reader = csv::Reader::from_reader(csv_str.as_bytes());
     let headers = reader.headers().unwrap().clone(); // ヘッダーを取得
 
-    let mut json_records = Vec::new(); // 結果として出力するレコードを保持
+    let mut json_records = JsonValue::new_array(); // JSON 配列
 
     // 各レコードを処理
     for result in reader.records() {
         let record = result.unwrap();
-        let mut json_object = serde_json::Map::new();
 
-        // フィールドをヘッダーの順序に従って追加
+        // フィールドを順序付きで保持するためにオブジェクトを作成
+        let mut json_object = JsonValue::new_object();
         for (header, field) in headers.iter().zip(record.iter()) {
-            json_object.insert(header.to_string(), serde_json::Value::String(field.to_string()));
+            json_object[header] = field.into();
         }
 
-        // JSONオブジェクトをリストに追加
-        json_records.push(serde_json::Value::Object(json_object));
+        // JSON オブジェクトを配列に追加
+        json_records.push(json_object).unwrap();
     }
 
     // JSON文字列に変換
-    let json_output = serde_json::to_string(&json_records).unwrap();
+    let json_output = json::stringify_pretty(json_records, 4);
+
     let json_c_string = CString::new(json_output).unwrap();
 
     // 処理終了時間の記録
     let elapsed_time = start_time.elapsed();
-
-    // 実行時間をログに出力（ここでは標準出力に出力していますが、必要に応じて他の方法でログを記録できます）
     println!("CSV → JSON 変換にかかった時間: {:?}", elapsed_time);
 
     // ポインタを返す
