@@ -1,0 +1,10 @@
+version: "3.8"
+services:
+  rust-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/usr/src/myapp
+    working_dir: /usr/src/myapp
+    command: cargo run
