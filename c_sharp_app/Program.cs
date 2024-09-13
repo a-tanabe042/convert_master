@@ -18,43 +18,29 @@ class Program
 
             // assets/csvフォルダのパス
             string csvFolderPath = Path.Combine(basePath, "assets", "csv");
+            string jsonFolderPath = Path.Combine(basePath, "assets", "json");
 
             // 出力ディレクトリ
-            string outputDir = Path.Combine(basePath, "data_output");
+            string outputDirCsv = Path.Combine(basePath, "data_output", "csv_output");
+            string outputDirJson = Path.Combine(basePath, "data_output", "json_output");
 
             // 出力ディレクトリが存在しない場合は作成
-            if (!Directory.Exists(outputDir))
+            if (!Directory.Exists(outputDirCsv))
             {
-                Directory.CreateDirectory(outputDir);
+                Directory.CreateDirectory(outputDirCsv);
+            }
+            if (!Directory.Exists(outputDirJson))
+            {
+                Directory.CreateDirectory(outputDirJson);
             }
 
-            // CSVフォルダ内の全てのCSVファイルを処理
-            string[] csvFiles = Directory.GetFiles(csvFolderPath, "*.csv");
-            foreach (string csvFilePath in csvFiles)
-            {
-                // ファイル名を取得し、拡張子を .json に変更
-                string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(csvFilePath);
-                string outputJsonPath = Path.Combine(outputDir, fileNameWithoutExtension + ".json");
-                // CSVファイルを読み込む
-                string csvData = File.ReadAllText(csvFilePath);
+            // CSV → JSON 変換
+            ConvertCsvToJson(csvFolderPath, outputDirJson);
 
-                // CSV → JSON 変換（Rustの関数を呼び出し）
-                Console.WriteLine("CSV → JSON 変換を実行します...");
-                IntPtr jsonPointer = RustInterop.ConvertCsvToJson(csvData);
+            // JSON → CSV 変換
+            ConvertJsonToCsv(jsonFolderPath, outputDirCsv);
 
-                if (jsonPointer == IntPtr.Zero)
-                {
-                    continue;
-                }
-                // JSONデータをC#の文字列に変換
-                string jsonData = RustInterop.ConvertPointerToString(jsonPointer);
-
-                // JSONデータをファイルに保存
-                File.WriteAllText(outputJsonPath, jsonData);
-                Console.WriteLine($"JSONデータを {outputJsonPath} に保存しました");
-            }
-
-            Console.WriteLine("全てのCSVファイルの変換が完了しました。");
+            Console.WriteLine("全ての変換が完了しました。");
         }
         catch (DllNotFoundException ex)
         {
@@ -71,23 +57,72 @@ class Program
             Console.WriteLine($"処理時間: {stopwatch.Elapsed.TotalSeconds} 秒");
         }
     }
+
+    static void ConvertCsvToJson(string csvFolderPath, string outputDirJson)
+    {
+        string[] csvFiles = Directory.GetFiles(csvFolderPath, "*.csv");
+        foreach (string csvFilePath in csvFiles)
+        {
+            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(csvFilePath);
+            string outputJsonPath = Path.Combine(outputDirJson, fileNameWithoutExtension + ".json");
+
+            string csvData = File.ReadAllText(csvFilePath);
+
+            Console.WriteLine("CSV → JSON 変換を実行します...");
+            IntPtr jsonPointer = RustInterop.ConvertCsvToJson(csvData);
+
+            if (jsonPointer == IntPtr.Zero)
+            {
+                continue;
+            }
+
+            string jsonData = RustInterop.ConvertPointerToString(jsonPointer);
+
+            File.WriteAllText(outputJsonPath, jsonData);
+            Console.WriteLine($"JSONデータを {outputJsonPath} に保存しました");
+        }
+    }
+
+    static void ConvertJsonToCsv(string jsonFolderPath, string outputDirCsv)
+    {
+        string[] jsonFiles = Directory.GetFiles(jsonFolderPath, "*.json");
+        foreach (string jsonFilePath in jsonFiles)
+        {
+            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(jsonFilePath);
+            string outputCsvPath = Path.Combine(outputDirCsv, fileNameWithoutExtension + ".csv");
+
+            string jsonData = File.ReadAllText(jsonFilePath);
+
+            Console.WriteLine("JSON → CSV 変換を実行します...");
+            IntPtr csvPointer = RustInterop.ConvertJsonToCsv(jsonData);
+
+            if (csvPointer == IntPtr.Zero)
+            {
+                continue;
+            }
+
+            string csvData = RustInterop.ConvertPointerToString(csvPointer);
+
+            File.WriteAllText(outputCsvPath, csvData);
+            Console.WriteLine($"CSVデータを {outputCsvPath} に保存しました");
+        }
+    }
 }
 
 public static class RustInterop
 {
-    // Rustで実装した CSV → JSON 変換関数をインポート
     [DllImport("librust_app.dylib", CallingConvention = CallingConvention.Cdecl, EntryPoint = "csv_to_json")]
-    // これは、Rustの関数のシグネチャに合わせています
     public static extern IntPtr ConvertCsvToJson(string csvData);
 
-    // 文字列ポインタをC#の文字列に変換するためのユーティリティ関数
+    [DllImport("librust_app.dylib", CallingConvention = CallingConvention.Cdecl, EntryPoint = "json_to_csv")]
+    public static extern IntPtr ConvertJsonToCsv(string jsonData);
+
     public static string ConvertPointerToString(IntPtr pointer)
     {
         if (pointer == IntPtr.Zero)
         {
             return null;
         }
-        // ポインタから文字列に変換
         return Marshal.PtrToStringAnsi(pointer);
     }
 }

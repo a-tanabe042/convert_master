@@ -1,12 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <OutputType>Exe</OutputType> <!-- ここで実行可能なアプリケーションとして設定します -->
+    <OutputType>Exe</OutputType> <!-- 実行可能なアプリケーションとして設定 -->
   </PropertyGroup>
 
   <ItemGroup>
     <!-- assets/csvフォルダ内のすべてのCSVファイルをコピー -->
     <None Update="assets/csv/*.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+
+    <!-- assets/jsonフォルダ内のすべてのJSONファイルをコピー -->
+    <None Update="assets/json/*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
