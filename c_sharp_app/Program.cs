@@ -40,6 +40,9 @@ class Program
             // JSON → CSV 変換
             ConvertJsonToCsv(jsonFolderPath, outputDirCsv);
 
+            // CSV  → QUERY 変換
+            ConvertCsvToQuery(csvFolderPath, "SampleTbl", outputDirJson);
+
             Console.WriteLine("全ての変換が完了しました。");
         }
         catch (DllNotFoundException ex)
@@ -107,6 +110,32 @@ class Program
             Console.WriteLine($"CSVデータを {outputCsvPath} に保存しました");
         }
     }
+
+    static void ConvertCsvToQuery(string csvFolderPath, string tableName, string outputDirSql)
+    {
+        string[] csvFiles = Directory.GetFiles(csvFolderPath, "*.csv");
+
+        foreach (string csvFilePath in csvFiles)
+        {
+            string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(csvFilePath);
+            string outputSqlPath = Path.Combine(outputDirSql, fileNameWithoutExtension + ".sql");
+
+            string csvData = File.ReadAllText(csvFilePath);
+
+            Console.WriteLine("CSV → QUERY 変換を実行します...");
+            IntPtr sqlPointer = RustInterop.ConvertCsvToQuery(csvData, tableName);
+
+            if (sqlPointer == IntPtr.Zero)
+            {
+                continue;
+            }
+
+            string queryData = RustInterop.ConvertPointerToString(sqlPointer);
+
+            File.WriteAllText(outputSqlPath, queryData);
+            Console.WriteLine($"CSVデータを {outputSqlPath} に保存しました");
+        }
+    }
 }
 
 public static class RustInterop
@@ -116,6 +145,9 @@ public static class RustInterop
 
     [DllImport("librust_app.dylib", CallingConvention = CallingConvention.Cdecl, EntryPoint = "json_to_csv")]
     public static extern IntPtr ConvertJsonToCsv(string jsonData);
+
+    [DllImport("rust_app.dll", CallingConvention = CallingConvention.Cdecl, EntryPoint = "csv_to_query")]
+    public static extern IntPtr ConvertCsvToQuery(string csvData, string tableName);
 
     public static string ConvertPointerToString(IntPtr pointer)
     {
