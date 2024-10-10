@@ -49,7 +49,6 @@
         "build",
         "${workspaceFolder}/c_sharp_app/c_sharp_app.csproj"
       ],
-      "group": "build",
       "problemMatcher": ["$msCompile"]
     },
     {
@@ -62,7 +61,18 @@
         "--project",
         "${workspaceFolder}/c_sharp_app/c_sharp_app.csproj"
       ],
-      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Build and Run All",
+      "type": "shell",
+      "dependsOn": [
+        "Build Rust",
+        "Copy Rust DLL",
+        "Clean C#",
+        "Build C#",
+        "Run C#"
+      ],
       "problemMatcher": []
     }
   ]
