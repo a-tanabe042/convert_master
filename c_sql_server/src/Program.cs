@@ -8,20 +8,40 @@ class Program
     {
         try
         {
-            // bin/Debug/net8.0/以下にファイルがある場合は、そのパスを取得
+            // 実行ファイルのベースパスを取得
             string basePath = AppContext.BaseDirectory;
 
-            // assets配下のフォルダのパス
+            // assets/csv フォルダのパス
             string csvFolderPath = Path.Combine(basePath, "assets", "csv");
 
-            // 変換後のデータを保存するディレクトリ
+            // SQL出力ディレクトリのパス
             string outputDirSql = Path.Combine(basePath, "data_output", "sql_output");
 
-            // 出力ディレクトリが存在しない場合は作成
-            if (!Directory.Exists(outputDirSql)) Directory.CreateDirectory(outputDirSql);
+            // ディレクトリの存在を確認、なければ作成
+            if (!Directory.Exists(outputDirSql))
+                Directory.CreateDirectory(outputDirSql);
 
-            // CSV → QUERY 変換
-            CsvToQueryConverter.Convert(csvFolderPath, "SampleTbl", outputDirSql);
+            // CSVファイルの取得
+            string[] csvFiles = Directory.GetFiles(csvFolderPath, "*.csv");
+
+            if (csvFiles.Length == 0)
+            {
+                Console.WriteLine($"CSVファイルが見つかりません。パス: {csvFolderPath}");
+                return;
+            }
+
+            // 各CSVファイルを処理
+            foreach (string csvFile in csvFiles)
+            {
+                // ファイル名からテーブル名を取得（拡張子なし）
+                string tableName = Path.GetFileNameWithoutExtension(csvFile);
+
+                Console.WriteLine($"テーブル名: {tableName}");
+                Console.WriteLine($"処理中のCSVファイル: {csvFile}");
+
+                // CSV → QUERY 変換の実行
+                CsvToQueryConverter.Convert(csvFile, tableName, outputDirSql);
+            }
 
             Console.WriteLine("全ての変換が完了しました。");
         }

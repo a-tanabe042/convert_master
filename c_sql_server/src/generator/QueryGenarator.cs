@@ -38,15 +38,32 @@ namespace Conversions
         }
 
         /// <summary>
-        /// CSVの1行目をヘッダーとして、2行目以降をSQL形式の値に変換します。
+        /// CSVの1行をSQL形式の値に変換します。
         /// </summary>
-        /// <param name="line">CSVの1行目</param>
+        /// <param name="line">CSVの1行</param>
         /// <returns>SQL形式の値</returns>
         private static string ConvertLineToSqlValues(string line)
         {
             var values = line.Split(',')
-                             .Select(value => $"'{value.Trim()}'");
+                             .Select(value => ConvertValue(value.Trim()));
             return $"({string.Join(", ", values)})";
+        }
+
+        /// <summary>
+        /// 値を適切なSQL形式に変換します。
+        /// 数値はそのまま、文字列はシングルクォートで囲みます。
+        /// </summary>
+        /// <param name="value">CSVのセルの値</param>
+        /// <returns>SQL用の文字列</returns>
+        private static string ConvertValue(string value)
+        {
+            // 数値かどうかを判定し、数値の場合はそのまま返す
+            if (int.TryParse(value, out _))
+            {
+                return value;
+            }
+            // それ以外はシングルクォートで囲む
+            return $"'{value}'";
         }
     }
 }
