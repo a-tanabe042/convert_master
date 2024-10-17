@@ -17,10 +17,12 @@ class Program
         switch (command)
         {
             case "convert":
+                // csvファイルをsqlファイルに変換
                 CsvToSqlConverter.Run();
                 break;
 
             case "mapping":
+                // 旧データから新データへのマッピング処理を実行
                 MappingProcessor.Run();
                 break;
 
