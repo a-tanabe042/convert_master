@@ -23,7 +23,7 @@ class Program
 
             case "mapping":
                 // 旧データから新データへのマッピング処理を実行
-                MappingProcessor.Run();
+                MappingProcessor.RunAll();
                 break;
 
             default:
