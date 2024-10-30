@@ -2,44 +2,118 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Globalization;
+using CsvHelper;
 using Dapper;
+using System.IO;
+using System.Linq;
 
-namespace DapperExample
+namespace AbstractInsertExample
 {
-    public class User
+    // Postエンティティクラス
+    public class Post
     {
-        public int Id { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
+        public string Title { get; set; } = string.Empty;   // 投稿のタイトル
+        public string Content { get; set; } = string.Empty; // 投稿の内容
     }
 
+    // 抽象クラス：共通のDB操作を定義
+    public abstract class AbstractDatabaseHandler<T>
+    {
+        protected abstract string TableName { get; }
+        protected abstract string InsertQuery { get; }
+        protected abstract string ConnectionString { get; }
+
+        // 複数レコードの挿入
+        public void InsertEntities(IEnumerable<T> entities)
+        {
+            foreach (var entity in entities)
+            {
+                int newId = InsertEntity(entity); // 単一レコードを挿入し、ID取得
+                Console.WriteLine($"テーブル {TableName} に挿入されました。生成されたID: {newId}");
+            }
+        }
+
+        // 単一レコードの挿入とID取得
+        private int InsertEntity(T entity)
+        {
+            var parameters = CreateParameters(entity); // パラメータ作成
+            return ExecuteInsert(InsertQuery, parameters); // 挿入とID取得
+        }
+
+        // データベースにクエリを実行し、生成されたIDを取得
+        private int ExecuteInsert(string query, object parameters)
+        {
+            using (IDbConnection db = new SqlConnection(ConnectionString))
+            {
+                db.Open();
+                using var transaction = db.BeginTransaction();
+                try
+                {
+                    var id = db.ExecuteScalar<int>(query, parameters, transaction: transaction);
+                    transaction.Commit(); // コミット
+                    return id; // 生成されたIDを返す
+                }
+                catch
+                {
+                    transaction.Rollback(); // エラー時にロールバック
+                    throw;
+                }
+            }
+        }
+
+        // エンティティのプロパティをパラメータに変換
+        private object CreateParameters(T entity)
+        {
+            var parameters = new Dictionary<string, object>();
+            foreach (var property in typeof(T).GetProperties())
+            {
+                parameters.Add(property.Name, property.GetValue(entity));
+            }
+            return parameters;
+        }
+    }
+
+    // Postテーブル用のDBハンドラークラス
+    public class PostDatabaseHandler : AbstractDatabaseHandler<Post>
+    {
+        protected override string TableName => "Posts"; // テーブル名
+
+        protected override string InsertQuery =>
+            "INSERT INTO Posts (Title, Content) VALUES (@Title, @Content); SELECT SCOPE_IDENTITY();";
+
+        protected override string ConnectionString =>
+            "Data Source=Server;Initial Catalog=YourDatabase;User ID=your_user;Password=your_password;";
+
+        // 外部データからレコードを取得するメソッド
+        public IEnumerable<Post> GetRecords(string filePath)
+        {
+            using var reader = new StreamReader(filePath);
+            using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+
+            // CSVファイルの内容をPostオブジェクトのリストに変換
+            return csv.GetRecords<Post>().ToList();
+        }
+    }
+
+    // メインプログラム
     public class Program
     {
-        // カラムのマッピング辞書（事前に定義）
-        private static readonly Dictionary<string, string> ColumnMapping = new Dictionary<string, string>
-        {
-            { "Id", "UserId" },
-            { "Name", "FullName" },
-            { "Email", "EmailAddress" }
-        };
-
-        static string connectionString = "Data Source=Server;Initial Catalog=YourDatabase;User ID=your_user;Password=your_password;";
-
         public static void Main(string[] args)
         {
             try
             {
-                // データベースからユーザー一覧を取得
-                List<User> users = GetUsersFromDatabase();
+                // Postテーブル用のハンドラーを作成
+                var postHandler = new PostDatabaseHandler();
 
-                // 各ユーザーを型変換し、別のDBに挿入
-                foreach (var user in users)
-                {
-                    var convertedUser = ConvertUser(user);
-                    InsertUserWithMapping(connectionString, convertedUser);
-                }
+                // 外部CSVファイルから投稿データを取得
+                string filePath = "/path/to/your/posts.csv"; // CSVファイルのパス
+                var posts = postHandler.GetRecords(filePath); // レコードを取得
 
-                Console.WriteLine("全てのユーザーが新しいデータベースに挿入されました。");
+                // 取得したデータをデータベースに挿入
+                postHandler.InsertEntities(posts);
+
+                Console.WriteLine("全てのデータが正常に挿入されました。");
             }
             catch (Exception ex)
             {
@@ -47,138 +121,6 @@ namespace DapperExample
             }
 
             Console.WriteLine("プログラム終了。");
-        }
-
-        // データベースからユーザー情報を取得し、Listに格納
-        public static List<User> GetUsersFromDatabase()
-        {
-            using (IDbConnection db = new SqlConnection(connectionString))
-            {
-                string query = "SELECT Id, Name, Email FROM Users;";
-                var users = db.Query<User>(query).AsList(); // クエリ結果をListに変換
-                return users;
-            }
-        }
-
-        // 型変換メソッド（現時点では何もしない）
-        public static User ConvertUser(User user)
-        {
-            // 将来的な型変換処理をここに記述
-            return user;
-        }
-
-        // ユーザー情報をDBに挿入するメソッド
-        public static void InsertUserWithMapping(string connectionString, User user)
-        {
-            using (IDbConnection db = new SqlConnection(connectionString))
-            {
-                string query = $"INSERT INTO Users ({ColumnMapping["Id"]}, {ColumnMapping["Name"]}, {ColumnMapping["Email"]}) " +
-                               "VALUES (@UserId, @FullName, @EmailAddress);";
-
-                var parameters = new
-                {
-                    UserId = user.Id,
-                    FullName = user.Name,
-                    EmailAddress = user.Email
-                };
-
-                try
-                {
-                    db.Execute(query, parameters);
-                    Console.WriteLine($"ユーザー「{user.Name}」の挿入に成功しました。");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"ユーザー「{user.Name}」の挿入に失敗しました: {ex.Message}");
-                }
-            }
-        }
-    }
-}
-
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using ClosedXML.Excel;
-
-namespace Convert
-{
-
-    // Entity class
-    public class User
-    {
-        public int Id { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-    }
-
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            try
-            {
-                string excelFilePath = "/Users/akifumitanabe/Desktop/excel/users.xlsx";
-                string sheetName = "Users"; // 読み込むタブの名前
-                string cellRange = "A2:C10"; // 読み込むセルの範囲
-
-                // データの取得 と　型チェック
-                List<User> users = ParseExcelFile(excelFilePath, sheetName, cellRange);
-                // データの取得
-                string bulkInsertQuery = GenerateBulkInsertQuery(users);
-
-                Console.WriteLine("Generated Bulk INSERT Query:");
-                Console.WriteLine(bulkInsertQuery);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error: {ex.Message}");
-            }
-
-            Console.WriteLine("\nPress Enter to exit...");
-            Console.ReadLine();
-        }
-
-        public static List<User> ParseExcelFile(string filePath, string sheetName, string cellRange)
-        {
-            var users = new List<User>();
-
-            // WLWorkbookを使ってExcelファイルを開く
-            using (var workbook = new XLWorkbook(filePath))
-            {
-                // シートを取得
-                var worksheet = workbook.Worksheet(sheetName);
-                // 指定したセル範囲の行を取得
-                var rows = worksheet.Range(cellRange).RowsUsed();
-
-                foreach (var row in rows)
-                {
-                    // セルの値を取得してUserオブジェクトに変換
-                    var user = new User
-                    {
-                        Id = int.Parse(row.Cell(1).GetString(), CultureInfo.InvariantCulture),
-                        Name = row.Cell(2).GetString(),
-                        Email = row.Cell(3).GetString()
-                    };
-                    users.Add(user);
-                }
-            }
-
-            return users;
-        }
-
-        public static string GenerateBulkInsertQuery(List<User> users)
-        {
-            if (users.Count == 0) return string.Empty;
-
-            string query = "INSERT INTO Users (Id, Name, Email) VALUES\n";
-            string values = string.Join(",\n", users.Select(user =>
-                $"({user.Id}, '{user.Name}', '{user.Email}')"));
-
-            return query + values + ";";
         }
     }
 }
