@@ -10,6 +10,13 @@ using System.Linq;
 
 namespace AbstractInsertExample
 {
+    // Userエンティティクラス
+    public class User
+    {
+        public string Name { get; set; } = string.Empty;  // ユーザー名
+        public string Email { get; set; } = string.Empty; // メールアドレス
+    }
+
     // Postエンティティクラス
     public class Post
     {
@@ -41,7 +48,7 @@ namespace AbstractInsertExample
             return ExecuteInsert(InsertQuery, parameters); // 挿入とID取得
         }
 
-        // データベースにクエリを実行し、生成されたIDを取得
+        // クエリを実行し、生成されたIDを取得
         private int ExecuteInsert(string query, object parameters)
         {
             using (IDbConnection db = new SqlConnection(ConnectionString))
@@ -52,7 +59,7 @@ namespace AbstractInsertExample
                 {
                     var id = db.ExecuteScalar<int>(query, parameters, transaction: transaction);
                     transaction.Commit(); // コミット
-                    return id; // 生成されたIDを返す
+                    return id;
                 }
                 catch
                 {
@@ -72,28 +79,40 @@ namespace AbstractInsertExample
             }
             return parameters;
         }
+
+        // 外部CSVファイルからレコードを取得
+        public IEnumerable<T> GetRecords(string filePath)
+        {
+            using var reader = new StreamReader(filePath);
+            using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+
+            // CSVファイルの内容をT型のリストに変換して返す
+            return csv.GetRecords<T>().ToList();
+        }
+    }
+
+    // Userテーブル用のDBハンドラークラス
+    public class UserDatabaseHandler : AbstractDatabaseHandler<User>
+    {
+        protected override string TableName => "Users";
+
+        protected override string InsertQuery =>
+            "INSERT INTO Users (Name, Email) VALUES (@Name, @Email); SELECT SCOPE_IDENTITY();";
+
+        protected override string ConnectionString =>
+            "Data Source=Server;Initial Catalog=YourDatabase;User ID=your_user;Password=your_password;";
     }
 
     // Postテーブル用のDBハンドラークラス
     public class PostDatabaseHandler : AbstractDatabaseHandler<Post>
     {
-        protected override string TableName => "Posts"; // テーブル名
+        protected override string TableName => "Posts";
 
         protected override string InsertQuery =>
             "INSERT INTO Posts (Title, Content) VALUES (@Title, @Content); SELECT SCOPE_IDENTITY();";
 
         protected override string ConnectionString =>
             "Data Source=Server;Initial Catalog=YourDatabase;User ID=your_user;Password=your_password;";
-
-        // 外部データからレコードを取得するメソッド
-        public IEnumerable<Post> GetRecords(string filePath)
-        {
-            using var reader = new StreamReader(filePath);
-            using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-
-            // CSVファイルの内容をPostオブジェクトのリストに変換
-            return csv.GetRecords<Post>().ToList();
-        }
     }
 
     // メインプログラム
@@ -103,15 +122,17 @@ namespace AbstractInsertExample
         {
             try
             {
-                // Postテーブル用のハンドラーを作成
+                // Userデータの挿入
+                var userHandler = new UserDatabaseHandler();
+                string userCsvPath = "/path/to/your/users.csv"; // User用CSVファイルのパス
+                var users = userHandler.GetRecords(userCsvPath); // Userレコード取得
+                userHandler.InsertEntities(users); // Userデータを挿入
+
+                // Postデータの挿入
                 var postHandler = new PostDatabaseHandler();
-
-                // 外部CSVファイルから投稿データを取得
-                string filePath = "/path/to/your/posts.csv"; // CSVファイルのパス
-                var posts = postHandler.GetRecords(filePath); // レコードを取得
-
-                // 取得したデータをデータベースに挿入
-                postHandler.InsertEntities(posts);
+                string postCsvPath = "/path/to/your/posts.csv"; // Post用CSVファイルのパス
+                var posts = postHandler.GetRecords(postCsvPath); // Postレコード取得
+                postHandler.InsertEntities(posts); // Postデータを挿入
 
                 Console.WriteLine("全てのデータが正常に挿入されました。");
             }
