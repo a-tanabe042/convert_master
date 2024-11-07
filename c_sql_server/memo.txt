@@ -1,6 +1,0 @@
-// csv → query(insert) 変換処理
-dotnet run converter
-
-// 旧データ → 新データのmapping
-// mapping結果からquery(insert)の生成
-dotnet run mapping
