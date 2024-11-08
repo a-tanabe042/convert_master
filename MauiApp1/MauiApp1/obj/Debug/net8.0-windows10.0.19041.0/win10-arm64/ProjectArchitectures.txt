@@ -1,1 +1,0 @@
-C:\Users\akira\source\repos\MauiApp1\MauiApp1\MauiApp1.csproj;arm64
