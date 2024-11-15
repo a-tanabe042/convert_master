@@ -1,5 +1,5 @@
 [package]
-name = "rust_app"
+name = "librust_app"
 version = "0.1.0"
 edition = "2021"
 
@@ -8,4 +8,4 @@ crate-type = ["cdylib"]
 
 [dependencies]
 json = "0.12"
-csv = "1.1"
+csv = "1.0"
