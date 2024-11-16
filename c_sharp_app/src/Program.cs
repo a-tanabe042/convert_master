@@ -23,7 +23,7 @@ class Program
             // 変換後のデータを保存するディレクトリ
             string outputDirCsv = Path.Combine(basePath, "data_output", "csv_output");
             string outputDirJson = Path.Combine(basePath, "data_output", "json_output");
-            string outputDirSql = Path.Combine(basePath, "data_output", "sql_output");
+            string outputDirSql = Path.Combine(basePath, "data_output", "query_output");
 
             // 出力ディレクトリが存在しない場合は作成
             if (!Directory.Exists(outputDirCsv)) Directory.CreateDirectory(outputDirCsv);
@@ -34,10 +34,13 @@ class Program
             CsvToJsonConverter.Convert(csvFolderPath, outputDirJson);
 
             // JSON → CSV 変換
-            JsonToCsvConverter.Convert(jsonFolderPath, outputDirCsv);
+            // JsonToCsvConverter.Convert(jsonFolderPath, outputDirCsv);
 
             // CSV → QUERY 変換
             CsvToQueryConverter.Convert(csvFolderPath, "SampleTbl", outputDirSql);
+
+            // QUERY → CSV 変換
+            QueryToCsvConverter.Convert(queryFolderPath, outputDirCsv);
 
             Console.WriteLine("全ての変換が完了しました。");
         }

@@ -3,9 +3,9 @@ using System.Runtime.InteropServices;
 
 namespace Interop
 {
-    // <summary>
-    // Rustの関数を呼び出すためのクラス
-    // </summary>
+    /// <summary>
+    /// Rustの関数を呼び出すためのクラス
+    /// </summary>
     public static class RustFunctions
     {
         // CSV → JSON 変換関数を呼び出す
@@ -35,6 +35,15 @@ namespace Interop
             return csvToQueryFunc(csvData, tableName);
         }
 
+        // SQLクエリ → CSV 変換関数を呼び出す（追加したメソッド）
+        public static IntPtr ConvertQueryToCsv(string queryData)
+        {
+            IntPtr functionPtr = RustLibraryLoader.GetFunctionPointer("query_to_csv");
+            var queryToCsvFunc = Marshal.GetDelegateForFunctionPointer<ConvertQueryToCsvDelegate>(functionPtr);
+
+            return queryToCsvFunc(queryData); // SQLクエリデータを変換してポインタを返す
+        }
+
         // ポインタを文字列に変換する
         public static string ConvertPointerToString(IntPtr pointer)
         {
@@ -54,5 +63,8 @@ namespace Interop
 
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         private delegate IntPtr ConvertCsvToQueryDelegate(string csvData, string tableName);
+
+        [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+        private delegate IntPtr ConvertQueryToCsvDelegate(string queryData); 
     }
 }

@@ -16,7 +16,7 @@
     </None>
 
     <!-- assets/queryフォルダ内のすべてのqueryファイルをコピー -->
-    <None Update="assets/query/*.query">
+    <None Update="assets/query/*.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

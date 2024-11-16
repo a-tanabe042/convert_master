@@ -9,3 +9,4 @@ crate-type = ["cdylib"]
 [dependencies]
 json = "0.12"
 csv = "1.0"
+sqlparser = "0.25.0"
