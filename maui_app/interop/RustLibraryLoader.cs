@@ -21,9 +21,15 @@ namespace Interop
         // プラットフォームに応じてライブラリを選択
         private static string GetLibraryName()
         {
-            // return "librust_app.dll";
-            // return "librust_app.so";
-            return "librust_app.dylib";
+#if WINDOWS
+            return "librust_app.dll"; // Windows用のライブラリ
+#elif LINUX
+            return "librust_app.so"; // Linux用のライブラリ
+#elif MACCATALYST
+            return "librust_app.dylib"; // Mac Catalyst用のライブラリ
+#else
+            return "librust_app.dll"; // Windows用のライブラリ
+#endif
         }
 
         // ライブラリのロード

@@ -10,32 +10,22 @@ namespace maui_app
     /// </summary>
     public static class CsvToJsonConverter
     {
-        public static string Convert(string csvFolderPath)
-        {            
-            string jsonData = string.Empty;
+        public static string Convert(string csvData)
+        {
 
-            // 指定されたフォルダ内のすべてのCSVファイルを取得
-            string[] csvFiles = Directory.GetFiles(csvFolderPath, "*.csv");
-            foreach (string csvFilePath in csvFiles)
-            {
-                // CSVデータを読み込む
-                string csvData = File.ReadAllText(csvFilePath);
-                Console.WriteLine("CSV → JSON 変換を実行します...");
+            Console.WriteLine("CSV → JSON 変換を実行します...");
 
-                // Rust関数を呼び出して、CSVをJSONに変換
-                IntPtr jsonPointer = RustFunctions.ConvertCsvToJson(csvData);
+            // Rust関数を呼び出して、CSVをJSONに変換
+            IntPtr jsonPointer = RustFunctions.ConvertCsvToJson(csvData);
 
-                // 変換が失敗した場合は次のファイルへ
-                if (jsonPointer == IntPtr.Zero) continue;
+            // 変換が失敗した場合は次のファイルへ
+            if (jsonPointer == IntPtr.Zero) return "";
 
-                // ポインタから文字列に変換
-                jsonData = RustFunctions.ConvertPointerToString(jsonPointer);
+            // ポインタから文字列に変換
+            string jsonData = RustFunctions.ConvertPointerToString(jsonPointer);
 
-                Console.WriteLine($"JSONデータを作成しました: {csvFilePath}");
-
-                // Rust側で確保したメモリを解放
-                RustFunctions.FreeRustString(jsonPointer);
-            }
+            // Rust側で確保したメモリを解放
+            RustFunctions.FreeRustString(jsonPointer);
 
             return jsonData;
         }

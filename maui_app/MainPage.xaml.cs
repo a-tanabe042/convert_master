@@ -14,17 +14,44 @@ namespace maui_app
             InitializeComponent();
         }
 
-        private async void OnCounterClicked(object sender, EventArgs e)
+        // 選択されたファイルの内容を保存するプロパティ
+        private string SelectedFileContent { get; set; }
+
+        private async void OnSelectFolderClicked(object sender, EventArgs e)
         {
             try
             {
-                CounterBtn.Text = $"Hello {CounterBtn.Text}";
+                var allowedUTIs = new string[] { "public.comma-separated-values-text" }; // CSVファイルのUTI
+                var documentPicker = new UIDocumentPickerViewController(allowedUTIs, UIDocumentPickerMode.Import);
+                documentPicker.Delegate = new FilePickerDelegate(this); // デリゲートを設定
+                documentPicker.ModalPresentationStyle = UIModalPresentationStyle.FullScreen;
 
-                // CSV フォルダのパスを指定
-                string csvFolderPath = "Contents/Resources/csv";
+                var viewController = Platform.GetCurrentUIViewController();
+                if (viewController != null)
+                {
+                    await viewController.PresentViewControllerAsync(documentPicker, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"エラー: {ex.Message}");
+            }
+        }
 
-                // CSV → JSON 変換を実行
-                var jsonData = CsvToJsonConverter.Convert(csvFolderPath);
+        private async void OnConvertAndDownloadClicked(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(SelectedFileContent))
+            {
+                Console.WriteLine("ファイルが選択されていません。");
+                return;
+            }
+
+            try
+            {
+                // CSV → JSON 変換（CsvToJsonConverterは事前に実装済みのクラスを使用）
+                var jsonData = CsvToJsonConverter.Convert(SelectedFileContent);
+
+                // JSONデータをバイト配列に変換
                 byte[] jsonBytes = Encoding.UTF8.GetBytes(jsonData);
 
                 // 一時ファイルを作成
@@ -34,9 +61,9 @@ namespace maui_app
 
                 var fileUrl = new NSUrl(tempFilePath, false);
 
-                // UIDocumentPickerViewController を使用してファイルをエクスポート
+                // ダウンロード用の UIDocumentPickerViewController
                 var documentPicker = new UIDocumentPickerViewController(new[] { fileUrl }, UIDocumentPickerMode.ExportToService);
-                documentPicker.Delegate = new DocumentPickerDelegate();
+                documentPicker.Delegate = new FilePickerDelegate(this); // デリゲートを設定
                 documentPicker.ModalPresentationStyle = UIModalPresentationStyle.FullScreen;
 
                 var viewController = Platform.GetCurrentUIViewController();
@@ -45,32 +72,51 @@ namespace maui_app
                     await viewController.PresentViewControllerAsync(documentPicker, true);
                 }
 
-                CounterBtn.Text = "変換が完了しました! ファイルを保存しました。";
+                Console.WriteLine("変換が完了しました! ファイルをダウンロードしました。");
             }
             catch (Exception ex)
             {
-                CounterBtn.Text = $"エラー: {ex.Message}";
+                Console.WriteLine($"エラー: {ex.Message}");
             }
         }
-    }
 
-    // UIDocumentPicker のデリゲートクラスを定義
-    public class DocumentPickerDelegate : UIDocumentPickerDelegate
-    {
-        public override void WasCancelled(UIDocumentPickerViewController controller)
+        // 内部クラスとして FilePickerDelegate を定義
+        private class FilePickerDelegate : UIDocumentPickerDelegate
         {
-            Console.WriteLine("ファイル選択がキャンセルされました。");
-        }
+            private readonly MainPage mainPage;
 
-        public override void DidPickDocument(UIDocumentPickerViewController controller, NSUrl[] urls)
-        {
-            if (urls != null && urls.Length > 0)
+            public FilePickerDelegate(MainPage mainPage)
             {
-                Console.WriteLine("ファイルが保存されました: " + urls[0].Path);
+                this.mainPage = mainPage;
             }
-            else
+
+            public override void WasCancelled(UIDocumentPickerViewController controller)
             {
                 Console.WriteLine("ファイル選択がキャンセルされました。");
+            }
+
+            public override void DidPickDocument(UIDocumentPickerViewController controller, NSUrl[] urls)
+            {
+                if (urls != null && urls.Length > 0)
+                {
+                    try
+                    {
+                        // NSUrlを使ってファイルの内容を読み込む
+                        var fileUrl = urls[0];
+                        var filePath = fileUrl.Path;
+                        mainPage.SelectedFileContent = File.ReadAllText(filePath);
+                        fileUrl.StopAccessingSecurityScopedResource();
+                        Console.WriteLine("ファイルの内容を取得しました。");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"ファイルの読み込み中にエラーが発生しました: {ex.Message}");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("ファイル選択がキャンセルされました。");
+                }
             }
         }
     }

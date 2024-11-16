@@ -24,11 +24,18 @@
                 SemanticProperties.HeadingLevel="Level2"
                 SemanticProperties.Description="Welcome to dot net Multi platform App U I" />
 
+            <!-- フォルダ選択ボタン -->
             <Button
-                x:Name="CounterBtn"
-                Text="Click me" 
-                SemanticProperties.Hint="Counts the number of times you click"
-                Clicked="OnCounterClicked"
+                x:Name="SelectFolderBtn"
+                Text="フォルダを選択"
+                Clicked="OnSelectFolderClicked"
+                HorizontalOptions="Fill" />
+
+            <!-- 変換ボタンを追加 -->
+            <Button
+                x:Name="ConvertAndDownloadBtn"
+                Text="変換してダウンロード"
+                Clicked="OnConvertAndDownloadClicked"
                 HorizontalOptions="Fill" />
         </VerticalStackLayout>
     </ScrollView>
