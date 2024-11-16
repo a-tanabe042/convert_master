@@ -1,8 +1,9 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using Microsoft.Maui.Controls;
-using Microsoft.Maui.Storage;
-using Conversions;
+using Foundation;
+using UIKit;
 
 namespace maui_app
 {
@@ -22,24 +23,54 @@ namespace maui_app
                 // CSV フォルダのパスを指定
                 string csvFolderPath = "Contents/Resources/csv";
 
-                // ユーザーのドキュメントフォルダを取得
-                string userDocumentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-
-                // ファイル名と保存先パスを指定
-                string fileName = $"output_{Guid.NewGuid()}.json";
-                string filePath = Path.Combine(userDocumentsPath, fileName);
-
                 // CSV → JSON 変換を実行
                 var jsonData = CsvToJsonConverter.Convert(csvFolderPath);
+                byte[] jsonBytes = Encoding.UTF8.GetBytes(jsonData);
 
-                // JSON データをユーザーのドキュメントフォルダに保存
-                await File.WriteAllTextAsync(filePath, jsonData);
+                // 一時ファイルを作成
+                string tempFileName = $"output_{Guid.NewGuid()}.json";
+                string tempFilePath = Path.Combine(FileSystem.CacheDirectory, tempFileName);
+                await File.WriteAllBytesAsync(tempFilePath, jsonBytes);
 
-                CounterBtn.Text = $"変換が完了しました! ファイルが {filePath} に保存されました。";
+                var fileUrl = new NSUrl(tempFilePath, false);
+
+                // UIDocumentPickerViewController を使用してファイルをエクスポート
+                var documentPicker = new UIDocumentPickerViewController(new[] { fileUrl }, UIDocumentPickerMode.ExportToService);
+                documentPicker.Delegate = new DocumentPickerDelegate();
+                documentPicker.ModalPresentationStyle = UIModalPresentationStyle.FullScreen;
+
+                var viewController = Platform.GetCurrentUIViewController();
+                if (viewController != null)
+                {
+                    await viewController.PresentViewControllerAsync(documentPicker, true);
+                }
+
+                CounterBtn.Text = "変換が完了しました! ファイルを保存しました。";
             }
             catch (Exception ex)
             {
                 CounterBtn.Text = $"エラー: {ex.Message}";
+            }
+        }
+    }
+
+    // UIDocumentPicker のデリゲートクラスを定義
+    public class DocumentPickerDelegate : UIDocumentPickerDelegate
+    {
+        public override void WasCancelled(UIDocumentPickerViewController controller)
+        {
+            Console.WriteLine("ファイル選択がキャンセルされました。");
+        }
+
+        public override void DidPickDocument(UIDocumentPickerViewController controller, NSUrl[] urls)
+        {
+            if (urls != null && urls.Length > 0)
+            {
+                Console.WriteLine("ファイルが保存されました: " + urls[0].Path);
+            }
+            else
+            {
+                Console.WriteLine("ファイル選択がキャンセルされました。");
             }
         }
     }
