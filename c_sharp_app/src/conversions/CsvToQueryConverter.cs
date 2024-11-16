@@ -27,6 +27,9 @@ namespace Conversions
                 string queryData = RustFunctions.ConvertPointerToString(sqlPointer);
                 File.WriteAllText(outputSqlPath, queryData);
                 Console.WriteLine($"SQLデータを {outputSqlPath} に保存しました");
+
+                // Rust側で確保したメモリを解放
+                RustFunctions.FreeRustString(sqlPointer);
             }
         }
     }

@@ -1,5 +1,6 @@
 extern crate csv;
 extern crate json;
+
 use std::ffi::{CStr, CString};
 use std::os::raw::c_char;
 use std::time::Instant;

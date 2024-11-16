@@ -7,6 +7,6 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-json = "0.12"
-csv = "1.0"
-sqlparser = "0.25.0"
+json = "0.12"          # JSONライブラリを使用するため
+csv = "1.0"            # CSVライブラリを使用するため
+sqlparser = "0.25.0"   # SQL解析ライブラリを使用するため

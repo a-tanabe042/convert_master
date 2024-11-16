@@ -33,14 +33,20 @@ class Program
             // CSV → JSON 変換
             CsvToJsonConverter.Convert(csvFolderPath, outputDirJson);
 
-            // JSON → CSV 変換
-            // JsonToCsvConverter.Convert(jsonFolderPath, outputDirCsv);
-
             // CSV → QUERY 変換
             CsvToQueryConverter.Convert(csvFolderPath, "SampleTbl", outputDirSql);
 
+            // JSON → CSV 変換
+            JsonToCsvConverter.Convert(jsonFolderPath, outputDirCsv);
+
+            // JSON → QUERY 変換
+            JsonToQueryConverter.Convert(jsonFolderPath, outputDirSql);
+
             // QUERY → CSV 変換
             QueryToCsvConverter.Convert(queryFolderPath, outputDirCsv);
+
+            // // JSON → QUERY 変換
+            QueryToJsonConverter.Convert(queryFolderPath, outputDirJson);
 
             Console.WriteLine("全ての変換が完了しました。");
         }

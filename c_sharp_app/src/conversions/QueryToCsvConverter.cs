@@ -35,6 +35,9 @@ namespace Conversions
                 // CSVデータをファイルに書き込む
                 File.WriteAllText(outputCsvPath, csvData);
                 Console.WriteLine($"CSVデータを {outputCsvPath} に保存しました");
+
+                // Rust側で確保したメモリを解放
+                RustFunctions.FreeRustString(csvPointer);
             }
         }
     }

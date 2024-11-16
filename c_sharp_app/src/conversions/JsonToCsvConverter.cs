@@ -27,6 +27,9 @@ namespace Conversions
                 string csvData = RustFunctions.ConvertPointerToString(csvPointer);
                 File.WriteAllText(outputCsvPath, csvData);
                 Console.WriteLine($"CSVデータを {outputCsvPath} に保存しました");
+
+                // Rust側で確保したメモリを解放
+                RustFunctions.FreeRustString(csvPointer);
             }
         }
     }

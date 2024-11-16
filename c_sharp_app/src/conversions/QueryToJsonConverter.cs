@@ -5,33 +5,34 @@ using Interop;
 namespace Conversions
 {
     /// <summary>
-    /// CSV → JSON 変換クラス
+    /// SQLクエリ → JSON変換クラス
     /// </summary>
-    public static class CsvToJsonConverter
+    public static class QueryToJsonConverter
     {
-        public static void Convert(string csvFolderPath, string outputDirJson)
+        public static void Convert(string queryFolderPath, string outputDirJson)
         {
-            // 指定されたフォルダ内のすべてのCSVファイルを取得
-            string[] csvFiles = Directory.GetFiles(csvFolderPath, "*.csv");
-            foreach (string csvFilePath in csvFiles)
+            // 指定されたフォルダ内のすべてのSQLファイルを取得
+            string[] queryFiles = Directory.GetFiles(queryFolderPath, "*.sql");
+            foreach (string queryFilePath in queryFiles)
             {
                 // ファイル名の拡張子を除いた部分を取得
-                string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(csvFilePath);
+                string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(queryFilePath);
                 // 出力先のJSONファイルパスを作成
                 string outputJsonPath = Path.Combine(outputDirJson, fileNameWithoutExtension + ".json");
-                // CSVデータを読み込む
-                string csvData = File.ReadAllText(csvFilePath);
+                // SQLデータを読み込む
+                string queryData = File.ReadAllText(queryFilePath);
 
-                Console.WriteLine("CSV → JSON 変換を実行します...");
+                Console.WriteLine("QUERY → JSON 変換を実行します...");
 
-                // Rust関数を呼び出して、CSVをJSONに変換
-                IntPtr jsonPointer = RustFunctions.ConvertCsvToJson(csvData);
+                // Rust関数を呼び出して、SQLクエリをJSON形式に変換
+                IntPtr jsonPointer = RustFunctions.ConvertQueryToJson(queryData);
 
                 // 変換が失敗した場合は次のファイルへ
                 if (jsonPointer == IntPtr.Zero) continue;
 
-                // ポインタから文字列に変換
+                // ポインタから文字列に変換し、メモリを解放
                 string jsonData = RustFunctions.ConvertPointerToString(jsonPointer);
+
                 // JSONデータをファイルに書き込む
                 File.WriteAllText(outputJsonPath, jsonData);
                 Console.WriteLine($"JSONデータを {outputJsonPath} に保存しました");
