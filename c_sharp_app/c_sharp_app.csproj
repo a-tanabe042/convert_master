@@ -14,5 +14,10 @@
     <None Update="assets/json/*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+
+    <!-- assets/queryフォルダ内のすべてのqueryファイルをコピー -->
+    <None Update="assets/query/*.query">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>
