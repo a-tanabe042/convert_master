@@ -1,0 +1,27 @@
+﻿<Properties DotNetCore.WorkloadInstallDontShowAgain="True" StartupConfiguration="{5D08CBC7-3AE3-401F-AF76-C599A275369C}|Default">
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MultiItemStartupConfigurations />
+  <MonoDevelop.Ide.Workbench ActiveDocument="MainPage.xaml">
+    <Files>
+      <File FileName="MainPage.xaml" Line="14" Column="22" />
+      <File FileName="MauiProgram.cs" />
+      <File FileName="MainPage.xaml.cs" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="maui_app" expanded="True">
+            <Node name="maui_app">
+              <Node name="MainPage.xaml" selected="True" />
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.ItemProperties.maui__app PreferredExecutionTarget="net8.0-maccatalyst" />
+</Properties>
