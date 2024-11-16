@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <!-- macOS -->
+    <TargetFrameworks>net8.0-maccatalyst;</TargetFrameworks>
+	<!-- windowsOS -->
+	<!-- <TargetFrameworks>net8.0-windows10.0.19041.0</TargetFrameworks> -->
+
+    <!-- ランタイム識別子を環境に応じて分ける -->
+    <RuntimeIdentifiers>maccatalyst-arm64</RuntimeIdentifiers> <!-- macOS 用 -->
+
+    <OutputType>Exe</OutputType>
+    <RootNamespace>maui_app</RootNamespace>
+    <UseMaui>true</UseMaui>
+    <SingleProject>true</SingleProject>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <!-- アプリケーションのタイトルと識別子を設定 -->
+    <ApplicationTitle>maui_app</ApplicationTitle>
+    <ApplicationId>com.companyname.maui_app</ApplicationId>
+    
+    <!-- バージョン情報を設定 -->
+    <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+    <ApplicationVersion>1</ApplicationVersion>
+
+	<!-- macOS -->
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">13.1</SupportedOSPlatformVersion>
+	<!-- windowsOS -->
+    <!-- <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion> -->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- 必要なMAUIリソース -->
+    <MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
+    <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
+    <MauiImage Include="Resources\Images\*" />
+    <MauiFont Include="Resources\Fonts\*" />
+    <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- 必要なパッケージ参照 -->
+    <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
+    <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
+  </ItemGroup>
+</Project>
