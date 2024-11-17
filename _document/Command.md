@@ -20,3 +20,8 @@ cd c_sharp_app
 dotnet build
 dotnet run
 ```
+
+mac os 
+dotnet clean
+dotnet build --framework net8.0-maccatalyst
+dotnet run --framework net8.0-maccatalyst

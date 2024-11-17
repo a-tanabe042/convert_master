@@ -15,7 +15,7 @@ namespace maui_app
         }
 
         // 選択されたファイルの内容を保存するプロパティ
-        private string SelectedFileContent { get; set; }
+        private string? SelectedFileContent { get; set; }
 
         private async void OnSelectFolderClicked(object sender, EventArgs e)
         {
@@ -103,7 +103,14 @@ namespace maui_app
                     {
                         // NSUrlを使ってファイルの内容を読み込む
                         var fileUrl = urls[0];
-                        var filePath = fileUrl.Path;
+                        var filePath = fileUrl.Path ?? string.Empty;
+
+                        if(filePath == string.Empty)
+                        {
+                            Console.WriteLine("ファイルパスが空です。");
+                            return;
+                        }
+
                         mainPage.SelectedFileContent = File.ReadAllText(filePath);
                         fileUrl.StopAccessingSecurityScopedResource();
                         Console.WriteLine("ファイルの内容を取得しました。");
