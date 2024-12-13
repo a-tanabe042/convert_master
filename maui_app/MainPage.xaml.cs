@@ -4,6 +4,8 @@ using System.Text;
 using Microsoft.Maui.Controls;
 using Foundation;
 using UIKit;
+using System.Diagnostics;
+using maui_app.Platforms.MacCatalyst.Controller;
 
 namespace maui_app
 {
@@ -21,6 +23,18 @@ namespace maui_app
         {
             try
             {
+                if(DeviceInfo.Platform == DevicePlatform.iOS)
+                {
+                    MacController macController = new MacController();
+                    macController.ImportInputFile(SelectedFileContent);
+                }
+                else
+                {
+                    Debug.WriteLine("このデバイスは、対応していません。");
+                }
+
+                return;
+
                 var allowedUTIs = new string[] { "public.comma-separated-values-text" }; // CSVファイルのUTI
                 var documentPicker = new UIDocumentPickerViewController(allowedUTIs, UIDocumentPickerMode.Import);
                 documentPicker.Delegate = new FilePickerDelegate(this); // デリゲートを設定
