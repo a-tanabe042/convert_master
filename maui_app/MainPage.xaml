@@ -11,45 +11,32 @@
                 Source="dotnet_bot.png"
                 HeightRequest="185"
                 Aspect="AspectFit"
-                SemanticProperties.Description="dot net bot in a race car number eight"/>
+                SemanticProperties.Description="dot net bot in a race car number eight" />
 
             <Label
                 Text="Hello, World!"
                 Style="{StaticResource Headline}"
-                SemanticProperties.HeadingLevel="Level1"/>
+                SemanticProperties.HeadingLevel="Level1" />
 
             <Label
                 Text="Welcome to &#10;.NET Multi-platform App UI"
                 Style="{StaticResource SubHeadline}"
                 SemanticProperties.HeadingLevel="Level2"
-                SemanticProperties.Description="Welcome to dot net Multi platform App U I"/>
+                SemanticProperties.Description="Welcome to dot net Multi platform App U I" />
 
             <!-- フォルダ選択ボタン -->
             <Button
                 x:Name="SelectFolderBtn"
                 Text="フォルダを選択"
                 Clicked="OnSelectFolderClicked"
-                HorizontalOptions="Fill"/>
+                HorizontalOptions="Fill" />
 
             <!-- 変換ボタンを追加 -->
             <Button
                 x:Name="ConvertAndDownloadBtn"
                 Text="変換してダウンロード"
                 Clicked="OnConvertAndDownloadClicked"
-                HorizontalOptions="Fill"/>
-
-            <!-- コンボボックスを追加 -->
-            <Picker x:Name="ComboBoxPicker"
-                    Title="選択してください"
-                    SelectedIndexChanged="OnComboBoxSelectionChanged">
-                <Picker.ItemsSource>
-                    <x:Array Type="{x:Type x:String}">
-                        <x:String>選択肢1</x:String>
-                        <x:String>選択肢2</x:String>
-                        <x:String>選択肢3</x:String>
-                    </x:Array>
-                </Picker.ItemsSource>
-            </Picker>
+                HorizontalOptions="Fill" />
         </VerticalStackLayout>
     </ScrollView>
 
