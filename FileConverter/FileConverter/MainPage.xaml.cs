@@ -1,36 +1,127 @@
-﻿using FileConverter.Controller;
+﻿using System.Diagnostics;
 
 namespace FileConverter
 {
     public partial class MainPage : ContentPage
     {
-        int count = 0;
+        const string CSV = "CSV";
+        const string JSON = "JSON";
+        const string SQL = "SQL";
 
+        /// <summary>変換モード</summary>
+        private enum ConvertMode
+        {
+            CsvToJSON,
+            CsvToSQL,
+            JSONToCsv,
+            JSONToSQL,
+            SQLToCsv,
+            SQLToJSON,
+            NONE
+        }
+
+        /// <summary>UserInterfaceクラス</summary>
+        private readonly UserInterface _userInterface;
+
+        /// <summary>FileHandlerクラス</summary>
+        private readonly FileHandler _fileHandler;
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
         public MainPage()
         {
             InitializeComponent();
+
+            // UserInterfaceクラスの初期化
+            _userInterface = new();
+            // FileHandlerクラスの初期化
+            _fileHandler = new FileHandler();
+
+            // Pickerの初期表示設定
+            OutputFormatPicker.SelectedIndex = 0;
         }
 
-        private void OnCounterClicked(object sender, EventArgs e)
+        /// <summary>
+        /// ファイル選択ボタン押下時処理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void OnSelectFileClicked(object sender, EventArgs e)
         {
-#if WINDOWS
-            // Windows独自の処理
-            WindowsController windowsCotroller = new WindowsController();
-            windowsCotroller.ImportInputFile("");
+            Debug.WriteLine("ファイル選択ボタンが押下されました。");
 
-#elif MACCATALYST
-            // Mac独自の処理
+            await _userInterface.SelectFile();
 
-#endif
-            count++;
+            // ラベルに選択したファイル名を表示
+            FilePathLabel.Text = _userInterface.FileFullPath;
+        }
 
-            if (count == 1)
-                CounterBtn.Text = $"Clicked {count} time";
+        /// <summary>
+        /// 変換ボタン押下時処理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void OnConvertButtonClicked(object sender, EventArgs e)
+        {
+            Debug.WriteLine("変換ボタンが押下されました。");
+
+            // ファイル内容取得
+            string content = File.ReadAllText(_userInterface.FileFullPath);
+
+            // 変換文字列取得
+            string data = GetConvertMode(_userInterface.InputFormat, _userInterface.OutputFormat, content);
+
+            // 変換データ出力
+            await UserInterface.SaveFileAsync(_userInterface.OutputFormat, data);
+        }
+
+        /// <summary>
+        /// 出力ファイル形式変更時処理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnSelectedIndexChanged(object sender, EventArgs e)
+        {
+            Debug.WriteLine("出力ファイル形式が変更されました。");
+
+            _userInterface.SelectOutputFormat((Picker)sender);
+        }
+
+        /// <summary>
+        /// 変換文字列取得
+        /// </summary>
+        /// <returns>変換文字列</returns>
+        private string GetConvertMode(string inputFormat, string outputFormat, string data)
+        {
+            if (inputFormat == CSV && outputFormat == JSON)
+            {
+                return CsvToJsonConverter.Convert(data);
+            }
+            else if (inputFormat == CSV && outputFormat == SQL)
+            {
+                return CsvToQueryConverter.Convert(data, "媒体基本情報");
+            }
+            else if (inputFormat == JSON && outputFormat == CSV)
+            {
+                return "";
+            }
+            else if (inputFormat == JSON && outputFormat == SQL)
+            {
+                return "";
+            }
+            else if (inputFormat == SQL && outputFormat == CSV)
+            {
+                return "";
+            }
+            else if (inputFormat == SQL && outputFormat == JSON)
+            {
+                return "";
+            }
             else
-                CounterBtn.Text = $"Clicked {count} times";
-
-            SemanticScreenReader.Announce(CounterBtn.Text);
+            {
+                return "";
+            }
         }
     }
-
 }
