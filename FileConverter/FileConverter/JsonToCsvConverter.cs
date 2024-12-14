@@ -7,28 +7,21 @@ namespace Conversions
     // </summary>
     public static class JsonToCsvConverter
     {
-        public static void Convert(string jsonFolderPath, string outputDirCsv)
+        public static string Convert(string jsonData)
         {
-            string[] jsonFiles = Directory.GetFiles(jsonFolderPath, "*.json");
-            foreach (string jsonFilePath in jsonFiles)
-            {
-                string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(jsonFilePath);
-                string outputCsvPath = Path.Combine(outputDirCsv, fileNameWithoutExtension + ".csv");
-                string jsonData = File.ReadAllText(jsonFilePath);
+            // 開始ログ
+            Console.WriteLine("JSON → CSV 変換を実行します...");
 
-                Console.WriteLine("JSON → CSV 変換を実行します...");
+            // ポインタ取得
+            IntPtr csvPointer = DataManager.ConvertJsonToCsv(jsonData);
 
-                IntPtr csvPointer = DataManager.ConvertJsonToCsv(jsonData);
+            // ポインタを文字列に変換
+            string csvData = DataManager.ConvertPointerToString(csvPointer);
 
-                if (csvPointer == IntPtr.Zero) continue;
+            // Rust側で確保したメモリを解放
+            //DataManager.FreeRustString(csvPointer);
 
-                string csvData = DataManager.ConvertPointerToString(csvPointer);
-                File.WriteAllText(outputCsvPath, csvData);
-                Console.WriteLine($"CSVデータを {outputCsvPath} に保存しました");
-
-                // Rust側で確保したメモリを解放
-                DataManager.FreeRustString(csvPointer);
-            }
+            return csvData;
         }
     }
 }

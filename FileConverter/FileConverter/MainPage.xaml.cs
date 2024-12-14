@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using Conversions;
+using System.Diagnostics;
 
 namespace FileConverter
 {
@@ -23,9 +24,6 @@ namespace FileConverter
         /// <summary>UserInterfaceクラス</summary>
         private readonly UserInterface _userInterface;
 
-        /// <summary>FileHandlerクラス</summary>
-        private readonly FileHandler _fileHandler;
-
         /// <summary>
         /// コンストラクタ
         /// </summary>
@@ -35,8 +33,6 @@ namespace FileConverter
 
             // UserInterfaceクラスの初期化
             _userInterface = new();
-            // FileHandlerクラスの初期化
-            _fileHandler = new FileHandler();
 
             // Pickerの初期表示設定
             OutputFormatPicker.SelectedIndex = 0;
@@ -100,23 +96,26 @@ namespace FileConverter
             }
             else if (inputFormat == CSV && outputFormat == SQL)
             {
-                return CsvToQueryConverter.Convert(data, "媒体基本情報");
+                return CsvToQueryConverter.Convert(data, "SampleTbl");
             }
             else if (inputFormat == JSON && outputFormat == CSV)
             {
-                return "";
+                return JsonToCsvConverter.Convert(data);
             }
             else if (inputFormat == JSON && outputFormat == SQL)
             {
-                return "";
+                // Rustの処理で、例外発生？
+                return JsonToQueryConverter.Convert(data);
             }
             else if (inputFormat == SQL && outputFormat == CSV)
             {
-                return "";
+                // Rustの処理で、例外発生？
+                return QueryToCsvConverter.Convert(data);
             }
             else if (inputFormat == SQL && outputFormat == JSON)
             {
-                return "";
+                // Rustの処理で、例外発生？
+                return QueryToJsonConverter.Convert(data);
             }
             else
             {

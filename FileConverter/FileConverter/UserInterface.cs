@@ -127,10 +127,5 @@ namespace FileConverter
                 Debug.WriteLine($"Error: {ex.Message}");
             }
         }
-
-#if WINDOWS
-        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        private static extern int MessageBox(IntPtr hwnd, string text, string  caption, uint type);
-#endif
     }
 }
