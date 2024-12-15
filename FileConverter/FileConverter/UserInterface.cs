@@ -1,7 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Runtime.InteropServices;
-using Microsoft.Maui.Controls;
-using Microsoft.Maui.Controls.Platform;
 
 #if WINDOWS
 using Windows.Storage;
@@ -23,6 +20,9 @@ namespace FileConverter
 
         /// <summary>出力ファイル形式</summary>
         private string _outputMode = string.Empty;
+
+        /// <summary>拡張子チェック用配列</summary>
+        private string[] _extensions = ["CSV", "JSON", "SQL"];
 
         #endregion
 
@@ -53,6 +53,10 @@ namespace FileConverter
             {
                 return _outputMode;
             }
+            set
+            {
+                _outputMode = value;
+            }
         }
 
         #endregion
@@ -60,22 +64,37 @@ namespace FileConverter
         /// <summary>
         /// ファイル選択
         /// </summary>
-        public async Task SelectFile()
+        public async Task<int> SelectFile()
         {
             try
             {
                 var result = await FilePicker.Default.PickAsync();
                 if (result != null)
                 {
-                    _fileFullPath = result.FullPath;
-
                     // ファイル拡張の取得
                     _inputFormat = Path.GetExtension(result.FullPath)[1..].ToUpper();
+
+                    if (_extensions.Contains(_inputFormat))
+                    {
+                        // パスを設定
+                        _fileFullPath = result.FullPath;
+
+                        // 正常
+                        return 1;
+                    }
+                    else
+                    {
+                        // 異常
+                        return 2;
+                    }
                 }
+
+                // 未選択
+                return 0;
             }
-            catch (Exception ex)
+            catch
             {
-                Debug.WriteLine($"Error {ex.Message}");
+                throw;
             }
         }
 
@@ -86,7 +105,6 @@ namespace FileConverter
         public bool SelectOutputFormat(Picker picker)
         {
             var selectedFormat = (string)picker.SelectedItem;
-            Debug.WriteLine($"出力ファイル形式が変更されました。: {selectedFormat}");
 
             _outputMode = selectedFormat;
 
@@ -121,6 +139,7 @@ namespace FileConverter
                 // 保存先のファイルに書き込み
                 using var writer = new StreamWriter(filePath, false);
                 writer.Write(data);
+                writer.Close();
             }
             catch (Exception ex)
             {

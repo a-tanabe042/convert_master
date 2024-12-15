@@ -26,16 +26,7 @@
             SelectedIndexChanged="OnSelectedIndexChanged"
             HorizontalOptions="Center"
             VerticalOptions="CenterAndExpand"
-            WidthRequest="200">
-            <Picker.ItemsSource>
-                <x:Array Type="{x:Type x:String}">
-                    <x:String>ファイルを選択してください。</x:String>
-                    <x:String>CSV</x:String>
-                    <x:String>JSON</x:String>
-                    <x:String>SQL</x:String>
-                </x:Array>
-            </Picker.ItemsSource>
-        </Picker>
+            WidthRequest="200" />
 
         <!-- 変換ボタン -->
         <Button
