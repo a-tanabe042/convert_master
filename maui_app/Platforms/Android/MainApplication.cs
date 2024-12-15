@@ -1,7 +1,7 @@
 ﻿using Android.App;
 using Android.Runtime;
 
-namespace maui_app;
+namespace FileConverter;
 
 [Application]
 public class MainApplication : MauiApplication

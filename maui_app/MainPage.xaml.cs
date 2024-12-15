@@ -1,133 +1,178 @@
-﻿using System;
-using System.IO;
-using System.Text;
-using Microsoft.Maui.Controls;
-using Foundation;
-using UIKit;
+﻿using Conversions;
 using System.Diagnostics;
-using maui_app.Platforms.MacCatalyst.Controller;
 
-namespace maui_app
+namespace FileConverter
 {
     public partial class MainPage : ContentPage
     {
+        const string CSV = "CSV";
+        const string JSON = "JSON";
+        const string SQL = "SQL";
+
+        /// <summary>UserInterfaceクラス</summary>
+        private readonly UserInterface _userInterface;
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
         public MainPage()
         {
             InitializeComponent();
+
+            // UserInterfaceクラスの初期化
+            _userInterface = new();
         }
 
-        // 選択されたファイルの内容を保存するプロパティ
-        private string? SelectedFileContent { get; set; }
-
-        private async void OnSelectFolderClicked(object sender, EventArgs e)
+        /// <summary>
+        /// ファイル選択ボタン押下時処理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void OnSelectFileClicked(object sender, EventArgs e)
         {
-            try
-            {
-       
-                var allowedUTIs = new string[] { "public.comma-separated-values-text" }; // CSVファイルのUTI
-                var documentPicker = new UIDocumentPickerViewController(allowedUTIs, UIDocumentPickerMode.Import);
-                documentPicker.Delegate = new FilePickerDelegate(this); // デリゲートを設定
-                documentPicker.ModalPresentationStyle = UIModalPresentationStyle.FullScreen;
-
-                var viewController = Platform.GetCurrentUIViewController();
-                if (viewController != null)
-                {
-                    await viewController.PresentViewControllerAsync(documentPicker, true);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"エラー: {ex.Message}");
-            }
-        }
-
-        private async void OnConvertAndDownloadClicked(object sender, EventArgs e)
-        {
-            if (string.IsNullOrEmpty(SelectedFileContent))
-            {
-                Console.WriteLine("ファイルが選択されていません。");
-                return;
-            }
+            Debug.WriteLine("ファイル選択ボタンが押下されました。");
 
             try
             {
-                // CSV → JSON 変換（CsvToJsonConverterは事前に実装済みのクラスを使用）
-                var jsonData = CsvToJsonConverter.Convert(SelectedFileContent);
+                int result = await _userInterface.SelectFile();
 
-                // JSONデータをバイト配列に変換
-                byte[] jsonBytes = Encoding.UTF8.GetBytes(jsonData);
-
-                // 一時ファイルを作成
-                string tempFileName = $"output_{Guid.NewGuid()}.json";
-                string tempFilePath = Path.Combine(FileSystem.CacheDirectory, tempFileName);
-                await File.WriteAllBytesAsync(tempFilePath, jsonBytes);
-
-                var fileUrl = new NSUrl(tempFilePath, false);
-
-                // ダウンロード用の UIDocumentPickerViewController
-                var documentPicker = new UIDocumentPickerViewController(new[] { fileUrl }, UIDocumentPickerMode.ExportToService);
-                documentPicker.Delegate = new FilePickerDelegate(this); // デリゲートを設定
-                documentPicker.ModalPresentationStyle = UIModalPresentationStyle.FullScreen;
-
-                var viewController = Platform.GetCurrentUIViewController();
-                if (viewController != null)
+                // ファイルを選択した場合
+                if (result == 1)
                 {
-                    await viewController.PresentViewControllerAsync(documentPicker, true);
+                    // ラベルに選択したファイル名を表示
+                    FilePathLabel.Text = _userInterface.FileFullPath;
+
+                    // Pickerの初期化
+                    InitialPicker(_userInterface.InputFormat);
+
+                    // Pickerの初期選択値を出力ファイル形式に設定
+                    _userInterface.OutputFormat = (string)OutputFormatPicker.SelectedItem;
                 }
-
-                Console.WriteLine("変換が完了しました! ファイルをダウンロードしました。");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"エラー: {ex.Message}");
-            }
-        }
-
-        // 内部クラスとして FilePickerDelegate を定義
-        private class FilePickerDelegate : UIDocumentPickerDelegate
-        {
-            private readonly MainPage mainPage;
-
-            public FilePickerDelegate(MainPage mainPage)
-            {
-                this.mainPage = mainPage;
-            }
-
-            public override void WasCancelled(UIDocumentPickerViewController controller)
-            {
-                Console.WriteLine("ファイル選択がキャンセルされました。");
-            }
-
-            public override void DidPickDocument(UIDocumentPickerViewController controller, NSUrl[] urls)
-            {
-                if (urls != null && urls.Length > 0)
+                else if (result == 2)
                 {
-                    try
-                    {
-                        // NSUrlを使ってファイルの内容を読み込む
-                        var fileUrl = urls[0];
-                        var filePath = fileUrl.Path ?? string.Empty;
-
-                        if(filePath == string.Empty)
-                        {
-                            Console.WriteLine("ファイルパスが空です。");
-                            return;
-                        }
-
-                        mainPage.SelectedFileContent = File.ReadAllText(filePath);
-                        fileUrl.StopAccessingSecurityScopedResource();
-                        Console.WriteLine("ファイルの内容を取得しました。");
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"ファイルの読み込み中にエラーが発生しました: {ex.Message}");
-                    }
+                    await DisplayAlert("【通知】", "CSV, JSON, SQL形式のファイルを選択してください。", "OK");
                 }
                 else
                 {
-                    Console.WriteLine("ファイル選択がキャンセルされました。");
+                    // 何もしない。
                 }
             }
+            catch (Exception ex)
+            {
+                await DisplayAlert("【例外通知】", ex.Message, "閉じる");
+            }
+        }
+
+        /// <summary>
+        /// 変換ボタン押下時処理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private async void OnConvertButtonClicked(object sender, EventArgs e)
+        {
+            Debug.WriteLine("変換ボタンが押下されました。");
+
+            try
+            {
+                if (_userInterface.FileFullPath != string.Empty && _userInterface.OutputFormat != string.Empty)
+                {
+                    // ファイル内容取得
+                    string content = File.ReadAllText(_userInterface.FileFullPath);
+
+                    // 変換文字列取得
+                    string data = GetConvertMode(_userInterface.InputFormat, _userInterface.OutputFormat, content);
+
+                    // 変換データ出力
+                    await UserInterface.SaveFileAsync(_userInterface.OutputFormat, data);
+
+                    await DisplayAlert("【通知】", "変換が完了しました。", "OK");
+                }
+                else
+                {
+                    await DisplayAlert("【通知】", "ファイルが選択されていません。", "OK");
+                }
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("【例外通知】", ex.Message, "閉じる");
+            }
+        }
+
+        /// <summary>
+        /// 出力ファイル形式変更時処理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void OnSelectedIndexChanged(object sender, EventArgs e)
+        {
+            _userInterface.SelectOutputFormat((Picker)sender);
+        }
+
+        /// <summary>
+        /// 変換文字列取得
+        /// </summary>
+        /// <returns>変換文字列</returns>
+        private static string GetConvertMode(string inputFormat, string outputFormat, string data)
+        {
+            if (inputFormat == CSV && outputFormat == JSON)
+            {
+                return CsvToJsonConverter.Convert(data);
+            }
+            else if (inputFormat == CSV && outputFormat == SQL)
+            {
+                return CsvToQueryConverter.Convert(data, "SampleTbl");
+            }
+            else if (inputFormat == JSON && outputFormat == CSV)
+            {
+                return JsonToCsvConverter.Convert(data);
+            }
+            else if (inputFormat == JSON && outputFormat == SQL)
+            {
+                // Rustの処理で、例外発生？
+                return JsonToQueryConverter.Convert(data);
+            }
+            else if (inputFormat == SQL && outputFormat == CSV)
+            {
+                // Rustの処理で、例外発生？
+                return QueryToCsvConverter.Convert(data);
+            }
+            else if (inputFormat == SQL && outputFormat == JSON)
+            {
+                // Rustの処理で、例外発生？
+                return QueryToJsonConverter.Convert(data);
+            }
+            else
+            {
+                return "";
+            }
+        }
+
+        /// <summary>
+        /// Pickerの初期化
+        /// </summary>
+        /// <param name="inputFormat">入力ファイル形式</param>
+        private void InitialPicker(string inputFormat)
+        {
+            OutputFormatPicker.Items.Clear();
+
+            if (inputFormat == CSV)
+            {
+                OutputFormatPicker.Items.Add("JSON");
+                OutputFormatPicker.Items.Add("SQL");
+            }
+            else if (inputFormat == JSON)
+            {
+                OutputFormatPicker.Items.Add("CSV");
+                OutputFormatPicker.Items.Add("SQL");
+            }
+            else
+            {
+                OutputFormatPicker.Items.Add("CSV");
+                OutputFormatPicker.Items.Add("JSON");
+            }
+
+            // 初期選択
+            OutputFormatPicker.SelectedIndex = 0;
         }
     }
 }

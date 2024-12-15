@@ -1,4 +1,4 @@
-﻿namespace maui_app;
+﻿namespace FileConverter;
 
 public partial class AppShell : Shell
 {

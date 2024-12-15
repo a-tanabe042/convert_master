@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "maui_app": {
+    "FileConverter": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": false,

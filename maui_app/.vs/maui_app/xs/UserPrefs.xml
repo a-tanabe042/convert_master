@@ -13,8 +13,8 @@
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
-          <Node name="maui_app" expanded="True">
-            <Node name="maui_app">
+          <Node name="FileConverter" expanded="True">
+            <Node name="FileConverter">
               <Node name="MainPage.xaml" selected="True" />
             </Node>
           </Node>

@@ -1,6 +1,6 @@
 ﻿using Foundation;
 
-namespace maui_app;
+namespace FileConverter;
 
 [Register("AppDelegate")]
 public class AppDelegate : MauiUIApplicationDelegate

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace maui_app;
+namespace FileConverter;
 
 public static class MauiProgram
 {

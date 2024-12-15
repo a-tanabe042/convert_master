@@ -1,7 +1,7 @@
 ﻿using ObjCRuntime;
 using UIKit;
 
-namespace maui_app;
+namespace FileConverter;
 
 public class Program
 {

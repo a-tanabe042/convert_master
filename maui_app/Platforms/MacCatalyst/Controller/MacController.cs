@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace maui_app.Platforms.MacCatalyst.Controller
+namespace FileConverter.Platforms.MacCatalyst.Controller
 {
     public class MacController
     {

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <Shell
-    x:Class="maui_app.AppShell"
+    x:Class="FileConverter.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:maui_app"
+    xmlns:local="clr-namespace:FileConverter"
     Shell.FlyoutBehavior="Disabled"
-    Title="maui_app">
+    Title="FileConverter">
 
     <ShellContent
         Title="Home"
