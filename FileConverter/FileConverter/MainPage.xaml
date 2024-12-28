@@ -6,6 +6,7 @@
     <StackLayout Padding="20">
 
         <!-- ファイル選択ボタン -->
+        <Label Text="①変換するファイルを選択してください。" />
         <Button
             x:Name="SelectFileButton"
             Text="ファイル選択"
@@ -20,15 +21,14 @@
             HorizontalOptions="Center" />
 
         <!-- 出力形式選択 -->
-        <Picker
-            x:Name="OutputFormatPicker"
-            Title="出力ファイル形式"
-            SelectedIndexChanged="OnSelectedIndexChanged"
-            HorizontalOptions="Center"
-            VerticalOptions="CenterAndExpand"
-            WidthRequest="200" />
+        <Label Text="②出力形式を選択してください。" />
+        <RadioButton x:Name="CsvRadioBtn" IsEnabled="False" Content="CSV" GroupName="Output" CheckedChanged="CheckedCsv" />
+        <RadioButton x:Name="JsonRadioBtn" IsEnabled="False" Content="JSON" GroupName="Output" CheckedChanged="CheckedJson" />
+        <RadioButton x:Name="SqlRadioBtn" IsEnabled="False" Content="SQL" GroupName="Output" CheckedChanged="CheckedSql" />
+        <Label x:Name="ErrorLabel01" TextColor="Red" />
 
         <!-- 変換ボタン -->
+        <Label Text="③読み込んだデータを、選択した形式へ変換します。" />
         <Button
             x:Name="ConvertButton"
             Text="変換"

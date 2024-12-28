@@ -102,13 +102,9 @@ namespace FileConverter
         /// 出力ファイル形式選択
         /// </summary>
         /// <returns></returns>
-        public bool SelectOutputFormat(Picker picker)
+        public void SelectOutputFormat(string outputFormat)
         {
-            var selectedFormat = (string)picker.SelectedItem;
-
-            _outputMode = selectedFormat;
-
-            return true;
+            _outputMode = outputFormat;
         }
 
         /// <summary>

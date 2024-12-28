@@ -42,11 +42,10 @@ namespace FileConverter
                     // ラベルに選択したファイル名を表示
                     FilePathLabel.Text = _userInterface.FileFullPath;
 
-                    // Pickerの初期化
-                    InitialPicker(_userInterface.InputFormat);
-
-                    // Pickerの初期選択値を出力ファイル形式に設定
-                    _userInterface.OutputFormat = (string)OutputFormatPicker.SelectedItem;
+                    // ラジオボタンをすべて活性状態にする
+                    CsvRadioBtn.IsEnabled = true;
+                    JsonRadioBtn.IsEnabled = true;
+                    SqlRadioBtn.IsEnabled = true;
                 }
                 else if (result == 2)
                 {
@@ -94,18 +93,8 @@ namespace FileConverter
             }
             catch (Exception ex)
             {
-                await DisplayAlert("【例外通知】", ex.Message, "閉じる");
+                await DisplayAlert("【例外通知】", ex.ToString(), "閉じる");
             }
-        }
-
-        /// <summary>
-        /// 出力ファイル形式変更時処理
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void OnSelectedIndexChanged(object sender, EventArgs e)
-        {
-            _userInterface.SelectOutputFormat((Picker)sender);
         }
 
         /// <summary>
@@ -148,31 +137,66 @@ namespace FileConverter
         }
 
         /// <summary>
-        /// Pickerの初期化
+        /// ラジオボタン(CSV)選択時イベント
         /// </summary>
-        /// <param name="inputFormat">入力ファイル形式</param>
-        private void InitialPicker(string inputFormat)
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CheckedCsv(object sender, CheckedChangedEventArgs e)
         {
-            OutputFormatPicker.Items.Clear();
+            // エラーメッセージを初期化
+            ErrorLabel01.Text = string.Empty;
 
-            if (inputFormat == CSV)
+            // 入力形式がCSVの場合
+            if (_userInterface.InputFormat == CSV)
             {
-                OutputFormatPicker.Items.Add("JSON");
-                OutputFormatPicker.Items.Add("SQL");
-            }
-            else if (inputFormat == JSON)
-            {
-                OutputFormatPicker.Items.Add("CSV");
-                OutputFormatPicker.Items.Add("SQL");
-            }
-            else
-            {
-                OutputFormatPicker.Items.Add("CSV");
-                OutputFormatPicker.Items.Add("JSON");
+                // エラーメッセージを画面に表示する。
+                ErrorLabel01.Text = "JSONまたは、SQLを選択してください。";
+                return;
             }
 
-            // 初期選択
-            OutputFormatPicker.SelectedIndex = 0;
+            _userInterface.SelectOutputFormat(CSV);
+        }
+
+        /// <summary>
+        /// ラジオボタン(JSON)選択時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CheckedJson(object sender, CheckedChangedEventArgs e)
+        {
+            // エラーメッセージを初期化
+            ErrorLabel01.Text = string.Empty;
+
+            // 入力形式がJSONの場合
+            if (_userInterface.InputFormat == JSON)
+            {
+                // エラーメッセージを画面に表示する。
+                ErrorLabel01.Text = "CSVまたは、SQLを選択してください。";
+                return;
+            }
+
+            _userInterface.SelectOutputFormat(JSON);
+        }
+
+        /// <summary>
+        /// ラジオボタン(QUERY)選択時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CheckedSql(object sender, CheckedChangedEventArgs e)
+        {
+            // エラーメッセージを初期化
+            ErrorLabel01.Text = string.Empty;
+
+            // 入力形式がSQLの場合
+            if (_userInterface.InputFormat == SQL)
+            {
+                // エラーメッセージを画面に表示する。
+                ErrorLabel01.Text = "CSVまたは、JSONを選択してください。";
+                return;
+            }
+
+            _userInterface.SelectOutputFormat(SQL);
         }
     }
 }
