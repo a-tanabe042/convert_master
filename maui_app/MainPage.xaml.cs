@@ -1,5 +1,10 @@
 ﻿using Conversions;
 using System.Diagnostics;
+using Foundation;
+using System.Text;
+using UIKit;
+using Microsoft.Maui.Storage;
+using System.IO;
 
 namespace FileConverter
 {
@@ -42,11 +47,10 @@ namespace FileConverter
                     // ラベルに選択したファイル名を表示
                     FilePathLabel.Text = _userInterface.FileFullPath;
 
-                    // Pickerの初期化
-                    InitialPicker(_userInterface.InputFormat);
-
-                    // Pickerの初期選択値を出力ファイル形式に設定
-                    _userInterface.OutputFormat = (string)OutputFormatPicker.SelectedItem;
+                    // ラジオボタンをすべて活性状態にする
+                    CsvRadioBtn.IsEnabled = true;
+                    JsonRadioBtn.IsEnabled = true;
+                    SqlRadioBtn.IsEnabled = true;
                 }
                 else if (result == 2)
                 {
@@ -74,18 +78,35 @@ namespace FileConverter
 
             try
             {
-                if (_userInterface.FileFullPath != string.Empty && _userInterface.OutputFormat != string.Empty)
+                if (!string.IsNullOrEmpty(_userInterface.FileFullPath) && !string.IsNullOrEmpty(_userInterface.OutputFormat))
                 {
-                    // ファイル内容取得
+                    // ファイル内容を取得
                     string content = File.ReadAllText(_userInterface.FileFullPath);
 
-                    // 変換文字列取得
+                    // 変換文字列を取得
                     string data = GetConvertMode(_userInterface.InputFormat, _userInterface.OutputFormat, content);
 
-                    // 変換データ出力
-                    await UserInterface.SaveFileAsync(_userInterface.OutputFormat, data);
+                    // JSONデータを一時ファイルに書き込み
+                    string tempFileName = $"output_{Guid.NewGuid()}.{_userInterface.OutputFormat.ToLower()}";
+                    string tempFilePath = Path.Combine(FileSystem.CacheDirectory, tempFileName);
+                    byte[] fileBytes = Encoding.UTF8.GetBytes(data);
+                    await File.WriteAllBytesAsync(tempFilePath, fileBytes);
 
-                    await DisplayAlert("【通知】", "変換が完了しました。", "OK");
+                    // UIDocumentPickerを使用してエクスポート
+                    var fileUrl = new NSUrl(tempFilePath, false);
+                    var documentPicker = new UIDocumentPickerViewController(new[] { fileUrl }, UIDocumentPickerMode.ExportToService)
+                    {
+                        Delegate = new DocumentPickerDelegate(),
+                        ModalPresentationStyle = UIModalPresentationStyle.FullScreen
+                    };
+
+                    var viewController = Platform.GetCurrentUIViewController();
+                    if (viewController != null)
+                    {
+                        await viewController.PresentViewControllerAsync(documentPicker, true);
+                    }
+
+                    ConvertButton.Text = "変換が完了しました！ ファイルを保存しました。";
                 }
                 else
                 {
@@ -94,20 +115,9 @@ namespace FileConverter
             }
             catch (Exception ex)
             {
-                await DisplayAlert("【例外通知】", ex.Message, "閉じる");
+                ConvertButton.Text = $"エラー: {ex.Message}";
             }
         }
-
-        /// <summary>
-        /// 出力ファイル形式変更時処理
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void OnSelectedIndexChanged(object sender, EventArgs e)
-        {
-            _userInterface.SelectOutputFormat((Picker)sender);
-        }
-
         /// <summary>
         /// 変換文字列取得
         /// </summary>
@@ -147,32 +157,95 @@ namespace FileConverter
             }
         }
 
-        /// <summary>
-        /// Pickerの初期化
-        /// </summary>
-        /// <param name="inputFormat">入力ファイル形式</param>
-        private void InitialPicker(string inputFormat)
+        private void CheckedCsv(object sender, CheckedChangedEventArgs e)
         {
-            OutputFormatPicker.Items.Clear();
+            Debug.WriteLine($"CheckedCsv called - IsChecked: {e.Value}");
 
-            if (inputFormat == CSV)
+            // 他のRadioButtonのIsCheckedをfalseにする
+            JsonRadioBtn.IsChecked = false;
+            SqlRadioBtn.IsChecked = false;
+
+            if (e.Value) // CSVが選択された場合
             {
-                OutputFormatPicker.Items.Add("JSON");
-                OutputFormatPicker.Items.Add("SQL");
+                ErrorLabel01.Text = string.Empty;
+
+                // 入力形式がCSVの場合、エラーメッセージを表示
+                if (_userInterface.InputFormat == CSV)
+                {
+                    ErrorLabel01.Text = "JSONまたは、SQLを選択してください。";
+                }
+                else
+                {
+                    _userInterface.SelectOutputFormat(CSV);
+                }
             }
-            else if (inputFormat == JSON)
+        }
+
+        private void CheckedJson(object sender, CheckedChangedEventArgs e)
+        {
+            Debug.WriteLine($"CheckedJson called - IsChecked: {e.Value}");
+
+            // 他のRadioButtonのIsCheckedをfalseにする
+            CsvRadioBtn.IsChecked = false;
+            SqlRadioBtn.IsChecked = false;
+
+            if (e.Value) // JSONが選択された場合
             {
-                OutputFormatPicker.Items.Add("CSV");
-                OutputFormatPicker.Items.Add("SQL");
+                ErrorLabel01.Text = string.Empty;
+
+                // 入力形式がJSONの場合、エラーメッセージを表示
+                if (_userInterface.InputFormat == JSON)
+                {
+                    ErrorLabel01.Text = "CSVまたは、SQLを選択してください。";
+                }
+                else
+                {
+                    _userInterface.SelectOutputFormat(JSON);
+                }
             }
-            else
+        }
+
+        private void CheckedSql(object sender, CheckedChangedEventArgs e)
+        {
+            Debug.WriteLine($"CheckedSql called - IsChecked: {e.Value}");
+
+            // 他のRadioButtonのIsCheckedをfalseにする
+            CsvRadioBtn.IsChecked = false;
+            JsonRadioBtn.IsChecked = false;
+
+            if (e.Value) // SQLが選択された場合
             {
-                OutputFormatPicker.Items.Add("CSV");
-                OutputFormatPicker.Items.Add("JSON");
+                ErrorLabel01.Text = string.Empty;
+
+                // 入力形式がSQLの場合、エラーメッセージを表示
+                if (_userInterface.InputFormat == SQL)
+                {
+                    ErrorLabel01.Text = "CSVまたは、JSONを選択してください。";
+                }
+                else
+                {
+                    _userInterface.SelectOutputFormat(SQL);
+                }
+            }
+        }
+        public class DocumentPickerDelegate : UIDocumentPickerDelegate
+        {
+            public override void WasCancelled(UIDocumentPickerViewController controller)
+            {
+                Console.WriteLine("ファイル選択がキャンセルされました。");
             }
 
-            // 初期選択
-            OutputFormatPicker.SelectedIndex = 0;
+            public override void DidPickDocument(UIDocumentPickerViewController controller, NSUrl[] urls)
+            {
+                if (urls != null && urls.Length > 0)
+                {
+                    Console.WriteLine("ファイルが保存されました: " + urls[0].Path);
+                }
+                else
+                {
+                    Console.WriteLine("ファイル選択がキャンセルされました。");
+                }
+            }
         }
     }
 }

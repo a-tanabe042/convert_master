@@ -6,35 +6,57 @@
     <StackLayout Padding="20">
 
         <!-- ファイル選択ボタン -->
+        <Label Text="①変換するファイルを選択してください。"/>
         <Button
             x:Name="SelectFileButton"
             Text="ファイル選択"
             Clicked="OnSelectFileClicked"
-            HorizontalOptions="Center" />
+            HorizontalOptions="Center"/>
 
         <!-- 選択されたファイルのパスを表示 -->
         <Label
             x:Name="FilePathLabel"
             Text="ファイルを選択してください。"
             VerticalOptions="CenterAndExpand"
-            HorizontalOptions="Center" />
+            HorizontalOptions="Center"/>
 
         <!-- 出力形式選択 -->
-        <Picker
-            x:Name="OutputFormatPicker"
-            Title="出力ファイル形式"
-            SelectedIndexChanged="OnSelectedIndexChanged"
-            HorizontalOptions="Center"
-            VerticalOptions="CenterAndExpand"
-            WidthRequest="200" />
+        <Label Text="②出力形式を選択してください。"/>
+        <RadioButton
+            x:Name="CsvRadioBtn"
+            Content="CSV"
+            GroupName="Output"
+            CheckedChanged="CheckedCsv"
+            HorizontalOptions="Start"
+            VerticalOptions="Center"
+            Margin="10,5"/>
+        <RadioButton
+            x:Name="JsonRadioBtn"
+            Content="JSON"
+            GroupName="Output"
+            CheckedChanged="CheckedJson"
+            HorizontalOptions="Start"
+            VerticalOptions="Center"
+            Margin="10,5"/>
+        <RadioButton
+            x:Name="SqlRadioBtn"
+            Content="SQL"
+            GroupName="Output"
+            CheckedChanged="CheckedSql"
+            HorizontalOptions="Start"
+            VerticalOptions="Center"
+            Margin="10,5"/>
+        <Label x:Name="ErrorLabel01"
+               TextColor="Red"/>
 
         <!-- 変換ボタン -->
+        <Label Text="③読み込んだデータを、選択した形式へ変換します。"/>
         <Button
             x:Name="ConvertButton"
             Text="変換"
             Clicked="OnConvertButtonClicked"
             HorizontalOptions="Center"
-            VerticalOptions="CenterAndExpand" />
+            VerticalOptions="CenterAndExpand"/>
 
     </StackLayout>
 </ContentPage>
