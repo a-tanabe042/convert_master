@@ -31,22 +31,22 @@ class Program
             if (!Directory.Exists(outputDirSql)) Directory.CreateDirectory(outputDirSql);
 
             // CSV → JSON 変換
-            CsvToJsonConverter.Convert(csvFolderPath, outputDirJson);
+            // CsvToJsonConverter.Convert(csvFolderPath, outputDirJson);
 
-            // CSV → QUERY 変換
-            CsvToQueryConverter.Convert(csvFolderPath, "SampleTbl", outputDirSql);
+            // // CSV → QUERY 変換
+            // CsvToQueryConverter.Convert(csvFolderPath, "SampleTbl", outputDirSql);
 
             // JSON → CSV 変換
             JsonToCsvConverter.Convert(jsonFolderPath, outputDirCsv);
 
-            // JSON → QUERY 変換
-            JsonToQueryConverter.Convert(jsonFolderPath, outputDirSql);
-
-            // QUERY → CSV 変換
-            QueryToCsvConverter.Convert(queryFolderPath, outputDirCsv);
-
             // // JSON → QUERY 変換
-            QueryToJsonConverter.Convert(queryFolderPath, outputDirJson);
+            // JsonToQueryConverter.Convert(jsonFolderPath, outputDirSql);
+
+            // // QUERY → CSV 変換
+            // QueryToCsvConverter.Convert(queryFolderPath, outputDirCsv);
+
+            // // // JSON → QUERY 変換
+            // QueryToJsonConverter.Convert(queryFolderPath, outputDirJson);
 
             Console.WriteLine("全ての変換が完了しました。");
         }
