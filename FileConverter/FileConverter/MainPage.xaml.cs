@@ -117,17 +117,14 @@ namespace FileConverter
             }
             else if (inputFormat == JSON && outputFormat == SQL)
             {
-                // Rustの処理で、例外発生？
                 return JsonToQueryConverter.Convert(data);
             }
             else if (inputFormat == SQL && outputFormat == CSV)
             {
-                // Rustの処理で、例外発生？
                 return QueryToCsvConverter.Convert(data);
             }
             else if (inputFormat == SQL && outputFormat == JSON)
             {
-                // Rustの処理で、例外発生？
                 return QueryToJsonConverter.Convert(data);
             }
             else
