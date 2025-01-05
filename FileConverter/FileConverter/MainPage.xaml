@@ -29,7 +29,7 @@
         <RadioButton x:Name="CsvRadioBtn" IsEnabled="False" Content="CSV" GroupName="Output" CheckedChanged="CheckedCsv" Margin="10,0,0,0" />
         <RadioButton x:Name="JsonRadioBtn" IsEnabled="False" Content="JSON" GroupName="Output" CheckedChanged="CheckedJson" Margin="10,0,0,0" />
         <RadioButton x:Name="SqlRadioBtn" IsEnabled="False" Content="SQL" GroupName="Output" CheckedChanged="CheckedSql" Margin="10,0,0,0" />
-        <Label x:Name="ErrorLabel01" TextColor="Red" />
+        <Label x:Name="ErrorLabel01" TextColor="Red" Margin="0,0,0,10" />
 
         <!-- 変換ボタン -->
         <Label Text="③読み込んだデータを、選択した形式へ変換します。" Margin="0,0,0,10" />
