@@ -1,62 +1,85 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="FileConverter.MainPage">
+             x:Class="FileConverter.MainPage"
+             BackgroundColor="#f4f4f4">
 
-    <StackLayout Padding="20">
+    <ScrollView>
+        <StackLayout Padding="20" Spacing="25" VerticalOptions="Center" HorizontalOptions="Center">
 
-        <!-- ファイル選択ボタン -->
-        <Label Text="①変換するファイルを選択してください。"/>
-        <Button
-            x:Name="SelectFileButton"
-            Text="ファイル選択"
-            Clicked="OnSelectFileClicked"
-            HorizontalOptions="Center"/>
+            <!-- セクション 1: ファイル選択 -->
+            <Frame Padding="15" BackgroundColor="White" CornerRadius="10" HasShadow="True">
+                <StackLayout Spacing="15">
+                    <Label Text="①変換するファイルを選択してください。" FontSize="18" FontAttributes="Bold" TextColor="#333"/>
+                    <Button
+                        x:Name="SelectFileButton"
+                        Text="ファイル選択"
+                        Clicked="OnSelectFileClicked"
+                        BackgroundColor="#0078D7"
+                        TextColor="White"
+                        CornerRadius="8"
+                        HorizontalOptions="Center"
+                        FontAttributes="Bold"/>
+                    <Label
+                        x:Name="FilePathLabel"
+                        Text="ファイルを選択してください。"
+                        VerticalOptions="CenterAndExpand"
+                        HorizontalOptions="Center"
+                        TextColor="#555"
+                        FontSize="14"/>
+                </StackLayout>
+            </Frame>
 
-        <!-- 選択されたファイルのパスを表示 -->
-        <Label
-            x:Name="FilePathLabel"
-            Text="ファイルを選択してください。"
-            VerticalOptions="CenterAndExpand"
-            HorizontalOptions="Center"/>
+            <!-- セクション 2: 出力形式選択 -->
+            <Frame Padding="15" BackgroundColor="White" CornerRadius="10" HasShadow="True">
+                <StackLayout Spacing="10">
+                    <Label Text="②出力形式を選択してください。" FontSize="18" FontAttributes="Bold" TextColor="Black"/>
+                    <StackLayout Spacing="10" Padding="10" BackgroundColor="#b3b3b3">
+                        <!-- ラジオボタン -->
+                        <RadioButton
+                            x:Name="CsvRadioBtn"
+                            Content="CSV"
+                            GroupName="Output"
+                            CheckedChanged="CheckedCsv"
+                            TextColor="Black"/>
+                        <RadioButton
+                            x:Name="JsonRadioBtn"
+                            Content="JSON"
+                            GroupName="Output"
+                            CheckedChanged="CheckedJson"
+                            TextColor="Black"/>
+                        <RadioButton
+                            x:Name="SqlRadioBtn"
+                            Content="SQL"
+                            GroupName="Output"
+                            CheckedChanged="CheckedSql"
+                            TextColor="Black"/>
+                    </StackLayout>
+                    <Label x:Name="ErrorLabel01"
+                           Text=""
+                           TextColor="Red"
+                           FontSize="14"
+                           FontAttributes="Italic"
+                           HorizontalOptions="Center"/>
+                </StackLayout>
+            </Frame>
 
-        <!-- 出力形式選択 -->
-        <Label Text="②出力形式を選択してください。"/>
-        <RadioButton
-            x:Name="CsvRadioBtn"
-            Content="CSV"
-            GroupName="Output"
-            CheckedChanged="CheckedCsv"
-            HorizontalOptions="Start"
-            VerticalOptions="Center"
-            Margin="10,5"/>
-        <RadioButton
-            x:Name="JsonRadioBtn"
-            Content="JSON"
-            GroupName="Output"
-            CheckedChanged="CheckedJson"
-            HorizontalOptions="Start"
-            VerticalOptions="Center"
-            Margin="10,5"/>
-        <RadioButton
-            x:Name="SqlRadioBtn"
-            Content="SQL"
-            GroupName="Output"
-            CheckedChanged="CheckedSql"
-            HorizontalOptions="Start"
-            VerticalOptions="Center"
-            Margin="10,5"/>
-        <Label x:Name="ErrorLabel01"
-               TextColor="Red"/>
+            <!-- セクション 3: 変換ボタン -->
+            <Frame Padding="15" BackgroundColor="White" CornerRadius="10" HasShadow="True">
+                <StackLayout Spacing="15" HorizontalOptions="Center">
+                    <Label Text="③読み込んだデータを、選択した形式へ変換します。" FontSize="18" FontAttributes="Bold" TextColor="#333"/>
+                    <Button
+                        x:Name="ConvertButton"
+                        Text="変換"
+                        Clicked="OnConvertButtonClicked"
+                        BackgroundColor="#0078D7"
+                        TextColor="White"
+                        CornerRadius="8"
+                        FontAttributes="Bold"
+                        HorizontalOptions="Center"/>
+                </StackLayout>
+            </Frame>
 
-        <!-- 変換ボタン -->
-        <Label Text="③読み込んだデータを、選択した形式へ変換します。"/>
-        <Button
-            x:Name="ConvertButton"
-            Text="変換"
-            Clicked="OnConvertButtonClicked"
-            HorizontalOptions="Center"
-            VerticalOptions="CenterAndExpand"/>
-
-    </StackLayout>
+        </StackLayout>
+    </ScrollView>
 </ContentPage>
