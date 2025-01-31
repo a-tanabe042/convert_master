@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Monaco Editor</title>
+  
+  <!-- Monaco Editor のローダー(CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/loader.js"></script>
+  <script>
+    require.config({
+      paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs' }
+    });
+    // WebWorker を CDN 上から取得
+    window.MonacoEnvironment = {
+      getWorkerUrl: function (workerId, label) {
+        return 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.34.1/min/vs/base/worker/workerMain.js';
+      }
+    };
+
+    let editor;
+
+    // editor生成
+    require(['vs/editor/editor.main'], function() {
+      editor = monaco.editor.create(document.getElementById('container'), {
+        value: "",                 // 初期テキストは空
+        language: "plaintext",     // デフォルトでプレーンテキスト
+        theme: "vs-dark",
+        automaticLayout: true
+      });
+    });
+
+    // C# 側から呼び出される想定の関数：エディタ内容をセット
+    // language 例: "plaintext" / "json" / "sql" / "javascript" etc.
+    function SetEditorValue(newValue, newLanguage) {
+      if (editor) {
+        // 言語切り替え
+        monaco.editor.setModelLanguage(editor.getModel(), newLanguage);
+        // テキスト更新
+        editor.setValue(newValue);
+      }
+    }
+
+    // C# 側から呼び出される想定の関数：エディタ内容を取得
+    function GetEditorValue() {
+      if (editor) {
+        return editor.getValue();
+      }
+      return "";
+    }
+  </script>
+  <style>
+    html, body {
+      margin: 0; padding: 0; height: 100%; width: 100%;
+      overflow: hidden;
+    }
+    #container {
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+  <div id="container"></div>
+</body>
+</html>

@@ -31,7 +31,7 @@
             </Frame>
 
             <!-- セクション 2: 出力形式選択 -->
-            <Frame Padding="15" BackgroundColor="White" CornerRadius="10" HasShadow="True">
+            <Frame Padding="15" BackgroundColor="#b3b3b3" CornerRadius="10" HasShadow="True">
                 <StackLayout Spacing="10">
                     <Label Text="②出力形式を選択してください。" FontSize="18" FontAttributes="Bold" TextColor="Black"/>
                     <StackLayout Spacing="10" Padding="10" BackgroundColor="#b3b3b3">

@@ -1,0 +1,1 @@
+-v --force --timestamp=none --sign - /Users/akifumitanabe/Desktop/convert_master/maui_app/bin/Debug/net8.0-maccatalyst/FileConverter.app/Contents/Resources/assets/dll/librust_app.dylib
